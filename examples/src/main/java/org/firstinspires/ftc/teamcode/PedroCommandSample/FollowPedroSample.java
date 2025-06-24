@@ -45,7 +45,9 @@ public class FollowPedroSample extends CommandOpMode {
                 // Updates follower to follow path
                 new RunCommand(() -> follower.update()),
 
-                new FollowPathCommand(follower, paths.get(0)),
+                new FollowPathCommand(follower, paths.get(0), 0.5).setHoldEnd(false),
+                new FollowPathCommand(follower, paths.get(0), false).setMaxPower(0.5),
+                new FollowPathCommand(follower, paths.get(0), false, 1.0).setMaxPower(0.5),
                 new FollowPathCommand(follower, pathChain),
                 new FollowPathCommand(follower, path)
         );

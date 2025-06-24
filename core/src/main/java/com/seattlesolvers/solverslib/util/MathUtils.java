@@ -7,6 +7,8 @@
 
 package com.seattlesolvers.solverslib.util;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
@@ -48,15 +50,38 @@ public final class MathUtils {
     }
 
     /**
+     * Function to normalize all angles
      *
-     * @param angleRadians The angle the be normalized (in radians)
-     * @return Returns the angle passed as the parameter normalized between -pi and pi
+     * @param angle the angle to be normalized, in degrees or radians
+     * @param zeroToMax whether the returned value should be normalized to 0 to max or -midpoint to midpoint
+     * @param angleUnit the unit the angle parameter is in
+     * @return the normalized angle
      */
-    public static double normalizeRadians(double angleRadians) {
-        double angle = angleRadians % (2 * Math.PI);
-        if (angle < 0) {
-            return angle + 2 * Math.PI;
+    public static double normalizeAngle(double angle, boolean zeroToMax, AngleUnit angleUnit) {
+        double max = returnMaxForAngleUnit(angleUnit);
+        double angle2 = angle % max;
+        if (zeroToMax && angle2 < 0) {
+            return angle2 + max;
+        } else if (!zeroToMax && angle2 < max/2) {
+            return angle2 + max;
+        } else {
+            return angle2;
         }
-        return angle;
+    }
+
+    public static double normalizeRadians(double angle, boolean zeroToFull) {
+        return normalizeAngle(angle, zeroToFull, AngleUnit.RADIANS);
+    }
+
+    public static double normalizeDegrees(double angle, boolean zeroToFull) {
+        return normalizeAngle(angle, zeroToFull, AngleUnit.DEGREES);
+    }
+
+    public static double returnMaxForAngleUnit(AngleUnit angleUnit) {
+        if (angleUnit.equals(AngleUnit.RADIANS)) {
+            return Math.PI * 2;
+        } else {
+            return 360;
+        }
     }
 }

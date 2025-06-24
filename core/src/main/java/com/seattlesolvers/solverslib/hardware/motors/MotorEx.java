@@ -7,18 +7,19 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+import java.util.Optional;
+
 /**
  * An extended motor class that utilizes more features than the
  * regular motor.
  *
- * @author Jackson
+ * @author Jackson and Saket
  */
 public class MotorEx extends Motor {
-
-    /**
-     * The motor for the MotorEx class.
-     */
     public DcMotorEx motorEx;
+
+    // The minimum difference between the current and requested motor power between motor writes
+    private double cachingTolerance = 0.0001;
 
     /**
      * Constructs the instance motor for the wrapper
@@ -61,12 +62,12 @@ public class MotorEx extends Motor {
         if (runmode == RunMode.VelocityControl) {
             double speed = bufferFraction * output * ACHIEVABLE_MAX_TICKS_PER_SECOND;
             double velocity = veloController.calculate(getCorrectedVelocity(), speed) + feedforward.calculate(speed, getAcceleration());
-            motorEx.setPower(velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND);
+            setPower(velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND);
         } else if (runmode == RunMode.PositionControl) {
             double error = positionController.calculate(encoder.getPosition());
-            motorEx.setPower(output * error);
+            setPower(output * error);
         } else {
-            motorEx.setPower(output);
+            setPower(output);
         }
     }
 
@@ -107,4 +108,28 @@ public class MotorEx extends Motor {
         return "Extended " + super.getDeviceType();
     }
 
+    /**
+     * @return the caching tolerance of the motor before it writes a new power to the motor
+     */
+    public double getCachingTolerance() {
+        return cachingTolerance;
+    }
+
+    /**
+     * @param cachingTolerance the new caching tolerance between motor writes
+     * @return this object for chaining purposes
+     */
+    public MotorEx setCachingTolerance(double cachingTolerance) {
+        this.cachingTolerance = cachingTolerance;
+        return this;
+    }
+
+    /**
+     * @param power power to be assigned to the motor if difference is greater than caching tolerance or if power is exactly 0
+     */
+    private void setPower(double power) {
+        if ((Math.abs(power - motorEx.getPower()) > cachingTolerance) || (power == 0 && motorEx.getPower() != 0)) {
+            motorEx.setPower(power);
+        }
+    }
 }

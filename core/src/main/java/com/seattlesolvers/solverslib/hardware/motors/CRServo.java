@@ -14,13 +14,14 @@ public class CRServo extends Motor {
      * The CR ServoEx motor object.
      */
     protected com.qualcomm.robotcore.hardware.CRServo crServo;
+    private final String id;
 
     /**
      * The constructor for the CR Servo.
      */
     public CRServo(HardwareMap hMap, String id) {
         crServo = hMap.get(com.qualcomm.robotcore.hardware.CRServo.class, id);
-
+        this.id = id;
     }
 
     @Override
@@ -56,5 +57,10 @@ public class CRServo extends Motor {
     @Override
     public void stopMotor() {
         stop();
+    }
+
+    @Override
+    public String getDeviceType() {
+        return "CR Servo; " + id + " in port " + crServo.getPortNumber();
     }
 }
