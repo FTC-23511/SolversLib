@@ -47,7 +47,7 @@ public class RepeatCommand extends CommandBase{
 
     /**
      * Creates a new overloaded RepeatCommand. Will run another command repeatedly, restarting it whenever it
-     * ends, until this command is interrupted or a condition is met.
+     * ends, until this command is interrupted or a condition is met. Effectively acts as a repeat until.
      *
      * @param command the command to run repeatedly
      * @param condition the condition to end the command
