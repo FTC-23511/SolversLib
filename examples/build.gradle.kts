@@ -12,7 +12,7 @@ dependencies {
     implementation("org.solverslib:core")
     implementation("org.solverslib:pedroPathing")
 
-    api("com.pedropathing:pedro:1.0.9")
+    api("com.pedropathing:ftc:2.0.0")
 }
 
 repositories {

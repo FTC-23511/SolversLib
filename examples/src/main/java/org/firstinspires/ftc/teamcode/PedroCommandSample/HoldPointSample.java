@@ -1,22 +1,22 @@
 package org.firstinspires.ftc.teamcode.PedroCommandSample;
 
-import java.util.ArrayList;
+
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.Path;
+import com.pedropathing.geometry.BezierCurve;
+import com.pedropathing.geometry.BezierLine;
+import com.pedropathing.geometry.Pose;
+import com.pedropathing.paths.PathChain;
+
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.RunCommand;
-import com.pedropathing.pathgen.BezierCurve;
-import com.pedropathing.pathgen.PathChain;
-import com.pedropathing.pathgen.Point;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
 import com.seattlesolvers.solverslib.pedroCommand.HoldPointCommand;
 
 @Autonomous
 public class HoldPointSample extends CommandOpMode {
-    Follower follower = new Follower(hardwareMap);
+    Follower follower;
 
     Pose pose = new Pose(
             72, 72, 90

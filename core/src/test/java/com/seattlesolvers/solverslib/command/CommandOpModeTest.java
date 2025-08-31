@@ -32,8 +32,9 @@ public class CommandOpModeTest extends CommandOpMode {
     public void testRunOpMode() {
         initialize();
         run();
+        end();
         assertEquals(5, x);
-        assertEquals(x1, x);
+        assertEquals(5, x1);
         reset();
     }
 }

@@ -1,9 +1,8 @@
 package com.seattlesolvers.solverslib.pedroCommand;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.localization.Pose;
-import com.pedropathing.pathgen.BezierPoint;
-import com.pedropathing.pathgen.Point;
+import com.pedropathing.geometry.BezierPoint;
+import com.pedropathing.geometry.Pose;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 /**
@@ -30,22 +29,10 @@ public class HoldPointCommand extends CommandBase {
         this.isFieldCentric = isFieldCentric;
     }
 
-    public HoldPointCommand(Follower follower, Point point, double heading, boolean isFieldCentric) {
-        this.follower = follower;
-        this.pose = new Pose(point.getX(), point.getY(), heading);
-        this.isFieldCentric = isFieldCentric;
-    }
-
-    public HoldPointCommand(Follower follower, BezierPoint bezierPoint, double heading, boolean isFieldCentric) {
-        this.follower = follower;
-        this.pose = new Pose(bezierPoint.getFirstControlPoint().getX(), bezierPoint.getFirstControlPoint().getY(), heading);
-        this.isFieldCentric = isFieldCentric;
-    }
-
     @Override
     public void initialize() {
         if (!isFieldCentric) {
-            pose.add(follower.getPose());
+            pose.plus(follower.getPose());
         }
 
         follower.holdPoint(pose);
@@ -58,6 +45,6 @@ public class HoldPointCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        follower.breakFollowing();
+        follower.resumePathFollowing();
     }
 }

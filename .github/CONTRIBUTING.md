@@ -18,12 +18,13 @@ Welcome to the SolversLib project! We hope we have something useful for you!
 
 ## Branch Naming
 
-| Instance | Branch | Description, Instructions, Notes |
-|---------|---------|----------------------------------|
-|Stable|`master`|Accepts merges from Working and Hotfixes|
-|Working|`dev`|Accepts merges from Features/Issues and Hotfixes|
-|Features/Issues|`feat-*`|Always branches off HEAD of Working|
-|Hotfix|`hotfix-*`|Always branches off of Stable|
+| Instance        | Branch                  | Description, Instructions, Notes                 |
+|-----------------|-------------------------|--------------------------------------------------|
+| Stable          | `master`                | Accepts merges from Working and Hotfixes         |
+| Beta            | `public-beta`           | Where testing happens from dev branch            |
+| Working         | `dev`                   | Accepts merges from Features/Issues and Hotfixes |
+| Features/Issues | `feat-*` or `feature-*` | Always branches off HEAD of Working              |
+| Hotfix          | `hotfix-*`              | Always branches off of Stable                    |
 
 ## Commit Naming
 
