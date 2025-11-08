@@ -10,6 +10,7 @@ package com.seattlesolvers.solverslib.command;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 /**
  * A base class for {@link Command}s.
@@ -52,5 +53,4 @@ public abstract class CommandBase implements Command {
     public void setSubsystem(String subsystem) {
         m_subsystem = subsystem;
     }
-
 }

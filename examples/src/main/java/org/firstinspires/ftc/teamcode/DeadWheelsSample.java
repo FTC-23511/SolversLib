@@ -1,13 +1,14 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.seattlesolvers.solverslib.drivebase.MecanumDrive;
+import com.seattlesolvers.solverslib.hardware.IncrementalEncoder;
 import com.seattlesolvers.solverslib.hardware.motors.Motor;
-import com.seattlesolvers.solverslib.hardware.motors.Motor.Encoder;
 import com.seattlesolvers.solverslib.hardware.motors.MotorEx;
 import com.seattlesolvers.solverslib.kinematics.HolonomicOdometry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.seattlesolvers.solverslib.util.RotationDirection;
 
 /**
  * This sample shows how to use dead wheels with external encoders
@@ -40,7 +41,7 @@ public class DeadWheelsSample extends LinearOpMode {
     private MotorEx frontLeft, frontRight, backLeft, backRight;
     private MecanumDrive driveTrain;
     private Motor intakeLeft, intakeRight, liftLeft, liftRight;
-    private Encoder leftOdometer, rightOdometer, centerOdometer;
+    private IncrementalEncoder leftOdometer, rightOdometer, centerOdometer;
     private HolonomicOdometry odometry;
 
     @Override
@@ -63,7 +64,7 @@ public class DeadWheelsSample extends LinearOpMode {
         rightOdometer = frontRight.encoder.setDistancePerPulse(DISTANCE_PER_PULSE);
         centerOdometer = backLeft.encoder.setDistancePerPulse(DISTANCE_PER_PULSE);
 
-        rightOdometer.setDirection(Motor.Direction.REVERSE);
+        rightOdometer.setDirection(RotationDirection.REVERSE);
 
         odometry = new HolonomicOdometry(
                 leftOdometer::getDistance,

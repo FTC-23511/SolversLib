@@ -6,19 +6,24 @@ import com.qualcomm.robotcore.hardware.PwmControl;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.hardware.AbsoluteAnalogEncoder;
+import com.seattlesolvers.solverslib.hardware.Encoder;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
  * An extended wrapper class for CRServos with more features
- * such as integration with absolute analog encoders for Axon servos
- * and their absolute encoders and power caching to reduce loop times.
+ * <p>
+ * - Integration with absolute analog encoders (Axon) or incremental encoders (regular) <br>
+ * - Power caching to reduce loop times
+ * </p>
+ *
+ * @param <T> the encoder type (e.g. AbsoluteAnalogEncoder, IncrementalEncoder)
  *
  * @author Saket
  */
-public class CRServoEx extends CRServo {
-    private AbsoluteAnalogEncoder absoluteEncoder;
+public class CRServoEx<T extends Encoder<?, ?>> extends CRServo {
+    private T encoder;
     private double cachingTolerance = 0.0001;
     private PIDFController pidf;
 
@@ -40,41 +45,70 @@ public class CRServoEx extends CRServo {
     /**
      * The constructor for the CR Servo.
      *
+     * <p> Example Usage: </p>
+     * <pre>{@code
+     * CRServoEx<AbsoluteAnalogEncoder> servo = new CrServoEx<>(
+     *     hardwareMap,
+     *     "servoId",
+     *     "encoderId",
+     *     3.3,
+     *     AngleUnit.RADIANS,
+     *     CRServoEx.RunMode.OptimizedPositionalControl
+     * )}</pre>
+     *
      * @param hwMap hardwareMap
      * @param id ID of the CR servo as configured
      * @param encoderID ID of the absolute encoder as configured
      * @param analogRange the range of voltage for the absolute encoder
      * @param angleUnit the angle unit for the absolute encoder
      * @param runmode the runmode of the CR servo
+     *
+     * @deprecated Goes against dependency injection.
+     *             Use {@link #CRServoEx(HardwareMap, String, Encoder, CRServoEx.RunMode)} instead.
      */
+    @Deprecated
+    @SuppressWarnings("unchecked")
     public CRServoEx(HardwareMap hwMap, String id, String encoderID, double analogRange, AngleUnit angleUnit, RunMode runmode) {
         super(hwMap, id);
-        this.absoluteEncoder = new AbsoluteAnalogEncoder(hwMap, encoderID, analogRange, angleUnit);
+        this.encoder = (T) new AbsoluteAnalogEncoder(hwMap, encoderID, analogRange, angleUnit);
         this.runmode = runmode;
     }
 
     /**
      * The constructor for the CR Servo.
      *
+     * <p> Example Usage: </p>
+     * <pre>{@code
+     * CRServoEx<T> servo = new CrServoEx<>(
+     *     hardwareMap,
+     *     "servoId",
+     *     encoder,
+     *     CRServoEx.RunMode.OptimizedPositionalControl
+     * )}</pre>
+     *
      * @param hwMap hardwareMap
      * @param id ID of the CR servo as configured
-     * @param absoluteEncoder the object for the absolute encoder to be associated with this servo
+     * @param encoder the object for the absolute encoder to be associated with this servo
      * @param runmode the runmode of the CR servo
      */
-    public CRServoEx(HardwareMap hwMap, String id, AbsoluteAnalogEncoder absoluteEncoder, RunMode runmode) {
+    public CRServoEx(HardwareMap hwMap, String id, T encoder, RunMode runmode) {
         super(hwMap, id);
-        this.absoluteEncoder = absoluteEncoder;
+        this.encoder = encoder;
         this.runmode = runmode;
     }
 
     /**
      * A simple constructor for the CR Servo with no absolute encoder.
+     *
+     * <p> Example Usage: </p>
+     * <pre>{@code CRServoEx<?> servo = new CrServoEx<>(hardwareMap, "servoId")}</pre>
+     *
      * @param hwMap hardwareMap
      * @param id ID of the CR servo as configured
      */
     public CRServoEx(HardwareMap hwMap, String id) {
         super(hwMap, id);
-        this.absoluteEncoder = null;
+        this.encoder = null;
         this.runmode = RunMode.RawPower;
     }
 
@@ -82,7 +116,7 @@ public class CRServoEx extends CRServo {
      * @param runmode the new runmode to be set
      * @return this object for chaining purposes
      */
-    public CRServoEx setRunMode(RunMode runmode) {
+    public CRServoEx<T> setRunMode(RunMode runmode) {
         this.runmode = runmode;
         return this;
     }
@@ -92,7 +126,7 @@ public class CRServoEx extends CRServo {
      * @param coefficients the coefficients for the PIDF controller
      * @return this object for chaining purposes
      */
-    public CRServoEx setPIDF(PIDFCoefficients coefficients) {
+    public CRServoEx<T> setPIDF(PIDFCoefficients coefficients) {
         this.pidf = new PIDFController(coefficients);
         return this;
     }
@@ -101,7 +135,7 @@ public class CRServoEx extends CRServo {
      * @param cachingTolerance the new caching tolerance between CR servo writes
      * @return this object for chaining purposes
      */
-    public CRServoEx setCachingTolerance(double cachingTolerance) {
+    public CRServoEx<T> setCachingTolerance(double cachingTolerance) {
         this.cachingTolerance = cachingTolerance;
         return this;
     }
@@ -114,19 +148,19 @@ public class CRServoEx extends CRServo {
     }
 
     /**
-     * @param absoluteEncoder the new absolute encoder to be associated with the CR servo
+     * @param encoder the new absolute encoder to be associated with the CR servo
      * @return this object for chaining purposes
      */
-    public CRServoEx setAbsoluteEncoder(AbsoluteAnalogEncoder absoluteEncoder) {
-        this.absoluteEncoder = absoluteEncoder;
+    public CRServoEx<T> setEncoder(T encoder) {
+        this.encoder = encoder;
         return this;
     }
 
     /**
      * @return the absolute encoder object associated with the CR servo
      */
-    public AbsoluteAnalogEncoder getAbsoluteEncoder() {
-        return absoluteEncoder;
+    public T getEncoder() {
+        return encoder;
     }
 
     /**
@@ -135,11 +169,11 @@ public class CRServoEx extends CRServo {
     @Override
     public void set(double output) {
         if (runmode == RunMode.OptimizedPositionalControl) {
-            if (absoluteEncoder == null) {
+            if (encoder == null) {
                 throw new IllegalStateException("Must have absolute encoder and PIDF coefficients for CR Servo to be in positional control");
             }
-            double normalizedTarget = MathUtils.normalizeAngle(output, true, absoluteEncoder.getAngleUnit());
-            double error = MathUtils.normalizeAngle(normalizedTarget - absoluteEncoder.getCurrentPosition(), false, absoluteEncoder.getAngleUnit());
+            double normalizedTarget = MathUtils.normalizeAngle(output, true, encoder.getAngleUnit());
+            double error = MathUtils.normalizeAngle(normalizedTarget - encoder.getAngle(), false, encoder.getAngleUnit());
             double power = pidf.calculate(0, error);
             setPower(power);
         } else {
@@ -151,7 +185,7 @@ public class CRServoEx extends CRServo {
      * @param pwmRange the PWM range the CR servo should be set to
      * @return this object for chaining purposes
      */
-    public CRServoEx setPwm(PwmControl.PwmRange pwmRange) {
+    public CRServoEx<T> setPwm(PwmControl.PwmRange pwmRange) {
         getController().setServoPwmRange(crServo.getPortNumber(), pwmRange);
         return this;
     }

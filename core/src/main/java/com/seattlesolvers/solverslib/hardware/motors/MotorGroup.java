@@ -2,6 +2,9 @@ package com.seattlesolvers.solverslib.hardware.motors;
 
 import androidx.annotation.NonNull;
 
+import com.seattlesolvers.solverslib.hardware.Encoder;
+import com.seattlesolvers.solverslib.hardware.IncrementalEncoder;
+
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -89,8 +92,8 @@ public class MotorGroup extends Motor implements Iterable<Motor> {
     }
 
     @Override
-    public Encoder setDistancePerPulse(double distancePerPulse) {
-        Encoder leaderEncoder = group[0].setDistancePerPulse(distancePerPulse);
+    public IncrementalEncoder setDistancePerPulse(double distancePerPulse) {
+        IncrementalEncoder leaderEncoder = group[0].setDistancePerPulse(distancePerPulse);
         for (int i = 1; i < group.length; i++) {
             group[i].setDistancePerPulse(distancePerPulse);
         }

@@ -69,7 +69,7 @@ public class CoaxialSwerveModule {
     public void updateModule() {
         // Wheel flipping optimization (if its quicker to swap motor direction and rotate the pod less, then do that)
         wheelFlipped = false;
-        angleError = MathUtils.normalizeRadians(MathUtils.normalizeRadians(targetVelocity.angle(), true) - swervo.getAbsoluteEncoder().getCurrentPosition(), false);
+        angleError = MathUtils.normalizeRadians(MathUtils.normalizeRadians(targetVelocity.angle(), true) - swervo.getEncoder().getAngle(), false);
         if (Math.abs(angleError) > Math.PI/2) {
             angleError += Math.PI * -Math.signum(angleError);
             wheelFlipped = true;
@@ -116,7 +116,7 @@ public class CoaxialSwerveModule {
     public String getPowerTelemetry() {
         return "Motor: " + MathUtils.round(motor.get(), 3) +
                 "; Servo: " + MathUtils.round(swervo.get(), 3) +
-                "; Absolute Encoder: " + MathUtils.round(swervo.getAbsoluteEncoder().getCurrentPosition(), 3);
+                "; Absolute Encoder: " + MathUtils.round(swervo.getEncoder().getAngle(), 3);
     }
 
     public Vector2d getTargetVelocity() {

@@ -10,8 +10,7 @@ import com.seattlesolvers.solverslib.controller.PController;
 import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.hardware.HardwareDevice;
-
-import java.util.function.Supplier;
+import com.seattlesolvers.solverslib.hardware.IncrementalEncoder;
 
 /**
  * This is the common wrapper for the {@link DcMotor} object in the
@@ -26,7 +25,7 @@ public class Motor implements HardwareDevice {
         RPM_117(1425.2, 117), RPM_223(753.2, 223), RPM_312(537.6, 312), RPM_435(383.6, 435),
         RPM_1150(145.6, 1150), RPM_1620(103.6, 1620), BARE(28, 6000), NONE(0, 0);
 
-        private double cpr, rpm;
+        private final double cpr, rpm;
 
         GoBILDA(double cpr, double rpm) {
             this.cpr = cpr;
@@ -44,144 +43,6 @@ public class Motor implements HardwareDevice {
         public double getAchievableMaxTicksPerSecond() {
             return cpr * rpm / 60;
         }
-    }
-
-    public enum Direction {
-        FORWARD(1), REVERSE(-1);
-
-        private int val;
-
-        Direction(int multiplier) {
-            val = multiplier;
-        }
-
-        public int getMultiplier() {
-            return val;
-        }
-    }
-
-    public class Encoder {
-
-        private Supplier<Integer> m_position;
-        private int resetVal, lastPosition;
-        private Direction direction;
-        private double lastTimeStamp, veloEstimate, dpp, accel, lastVelo;
-
-        /**
-         * The encoder object for the motor.
-         *
-         * @param position the position supplier which just points to the
-         *                 current position of the motor in ticks
-         */
-        public Encoder(Supplier<Integer> position) {
-            m_position = position;
-            dpp = 1;
-            resetVal = 0;
-            lastPosition = 0;
-            veloEstimate = 0;
-            direction = Direction.FORWARD;
-            lastTimeStamp = (double) System.nanoTime() / 1E9;
-        }
-
-        /**
-         * @return the current position of the encoder
-         */
-        public int getPosition() {
-            int currentPosition = m_position.get();
-            if (currentPosition != lastPosition) {
-                double currentTime = (double) System.nanoTime() / 1E9;
-                double dt = currentTime - lastTimeStamp;
-                veloEstimate = (currentPosition - lastPosition) / dt;
-                lastPosition = currentPosition;
-                lastTimeStamp = currentTime;
-            }
-            return direction.getMultiplier() * currentPosition - resetVal;
-        }
-
-        /**
-         * @return the distance traveled by the encoder
-         */
-        public double getDistance() {
-            return dpp * getPosition();
-        }
-
-        /**
-         * @return the velocity of the encoder adjusted to account for the distance per pulse
-         */
-        public double getRate() {
-            return dpp * getVelocity();
-        }
-
-        /**
-         * Resets the encoder without having to stop the motor.
-         */
-        public void reset() {
-            resetVal += getPosition();
-        }
-
-        /**
-         * Sets the distance per pulse of the encoder.
-         *
-         * @param distancePerPulse the desired distance per pulse (in units per tick)
-         */
-        public Encoder setDistancePerPulse(double distancePerPulse) {
-            dpp = distancePerPulse;
-            return this;
-        }
-
-        /**
-         * Sets the direction of the encoder to forward or reverse
-         *
-         * @param direction the desired direction
-         */
-        public void setDirection(Direction direction) {
-            this.direction = direction;
-        }
-
-        /**
-         * @return the number of revolutions turned by the encoder
-         */
-        public double getRevolutions() {
-            return getPosition() / getCPR();
-        }
-
-        /**
-         * @return the raw velocity of the motor reported by the encoder
-         */
-        public double getRawVelocity() {
-            double velo = getVelocity();
-            if (velo != lastVelo) {
-                double currentTime = (double) System.nanoTime() / 1E9;
-                double dt = currentTime - lastTimeStamp;
-                accel = (velo - lastVelo) / dt;
-                lastVelo = velo;
-                lastTimeStamp = currentTime;
-            }
-            return velo;
-        }
-
-        /**
-         * @return the estimated acceleration of the motor in ticks per second squared
-         */
-        public double getAcceleration() {
-            return accel;
-        }
-
-        private final static int CPS_STEP = 0x10000;
-
-        /**
-         * Corrects for velocity overflow
-         *
-         * @return the corrected velocity
-         */
-        public double getCorrectedVelocity() {
-            double real = getRawVelocity();
-            while (Math.abs(veloEstimate - real) > CPS_STEP / 2.0) {
-                real += Math.signum(veloEstimate - real) * CPS_STEP;
-            }
-            return real;
-        }
-
     }
 
     /**
@@ -208,7 +69,7 @@ public class Motor implements HardwareDevice {
     }
 
     public DcMotor motor;
-    public Encoder encoder;
+    public IncrementalEncoder encoder;
 
     /**
      * The runmode of the motor
@@ -259,7 +120,7 @@ public class Motor implements HardwareDevice {
      */
     public Motor(@NonNull HardwareMap hMap, String id, @NonNull GoBILDA gobildaType) {
         motor = hMap.get(DcMotor.class, id);
-        encoder = new Encoder(motor::getCurrentPosition);
+        encoder = new IncrementalEncoder(motor, gobildaType.getCPR());
 
         runmode = RunMode.RawPower;
         type = gobildaType;
@@ -313,7 +174,7 @@ public class Motor implements HardwareDevice {
      * @param distancePerPulse the desired distance per pulse
      * @return an encoder an object with the specified distance per pulse
      */
-    public Encoder setDistancePerPulse(double distancePerPulse) {
+    public IncrementalEncoder setDistancePerPulse(double distancePerPulse) {
         return encoder.setDistancePerPulse(distancePerPulse);
     }
 
@@ -349,7 +210,7 @@ public class Motor implements HardwareDevice {
      * Resets the internal position of the motor.
      */
     public void stopAndResetEncoder() {
-        encoder.resetVal = 0;
+        encoder.zeroOffset();
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
@@ -469,7 +330,7 @@ public class Motor implements HardwareDevice {
      * @param target the target position in ticks
      */
     public void setTargetPosition(int target) {
-        setTargetDistance(target * encoder.dpp);
+        setTargetDistance(target * encoder.getDistancePerPulse());
     }
 
     /**
@@ -496,7 +357,7 @@ public class Motor implements HardwareDevice {
     /**
      * Common method for inverting direction of a motor.
      *
-     * @param isInverted The state of inversion true is inverted.
+     * @param isInverted The state of inversion, true is inverted.
      * @return This object for chaining purposes.
      */
     public Motor setInverted(boolean isInverted) {
