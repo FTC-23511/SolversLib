@@ -368,6 +368,16 @@ public final class CommandScheduler {
     }
 
     /**
+     * Returns a list of all commands currently scheduled.
+     *
+     * @return an unmodifiable list of the scheduled commands
+     */
+    public List<Command> getScheduledCommands() {
+        return Collections.unmodifiableList(new ArrayList<>(m_scheduledCommands.keySet()));
+    }
+
+
+    /**
      * Cancels commands.  The scheduler will only call the interrupted method of a canceled command,
      * not the end method (though the interrupted method may itself call the end method).  Commands
      * will be canceled even if they are not scheduled as interruptible.
