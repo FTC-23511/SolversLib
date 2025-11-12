@@ -7,6 +7,9 @@
 
 package com.seattlesolvers.solverslib.command;
 
+import java.util.List;
+import java.util.function.Supplier;
+
 /**
  * A robot subsystem.  Subsystems are the basic unit of robot organization in the Command-based
  * framework; they encapsulate low-level hardware objects (motor controllers, sensors, etc) and
@@ -23,6 +26,7 @@ package com.seattlesolvers.solverslib.command;
  * class offers a simple base for user implementations that handles this.
  *
  * @author Jackson
+ * @author Miguel - FTC 21036
  */
 @SuppressWarnings("PMD.TooManyMethods")
 public interface Subsystem {
@@ -77,4 +81,75 @@ public interface Subsystem {
         CommandScheduler.getInstance().registerSubsystem(this);
     }
 
+    /**
+     * Constructs a command that runs an action once and finishes. Requires this subsystem.
+     *
+     * @param action the action to run
+     * @return the command
+     * @see InstantCommand
+     */
+    default Command runOnce(Runnable action) {
+        return Commands.runOnce(action, this);
+    }
+
+    /**
+     * Constructs a command that runs an action every iteration until interrupted. Requires this
+     * subsystem.
+     *
+     * @param action the action to run
+     * @return the command
+     * @see RunCommand
+     */
+    default Command run(Runnable action) {
+        return Commands.run(action, this);
+    }
+
+    /**
+     * Constructs a command that runs an action once and another action when the command is
+     * interrupted. Requires this subsystem.
+     *
+     * @param start the action to run on start
+     * @param end the action to run on interrupt
+     * @return the command
+     * @see StartEndCommand
+     */
+    default Command startEnd(Runnable start, Runnable end) {
+        return Commands.startEnd(start, end, this);
+    }
+
+    /**
+     * Constructs a command that runs an action every iteration until interrupted, and then runs a
+     * second action. Requires this subsystem.
+     *
+     * @param run the action to run every iteration
+     * @param end the action to run on interrupt
+     * @return the command
+     */
+    default Command runEnd(Runnable run, Runnable end) {
+        return Commands.runEnd(run, end, this);
+    }
+
+    /**
+     * Constructs a command that runs an action once and then runs another action every iteration
+     * until interrupted. Requires this subsystem.
+     *
+     * @param start the action to run on start
+     * @param run the action to run every iteration
+     * @return the command
+     */
+    default Command startRun(Runnable start, Runnable run) {
+        return Commands.startRun(start, run, this);
+    }
+
+    /**
+     * Constructs a {@link DeferredCommand} with the provided supplier. This subsystem is added as a
+     * requirement.
+     *
+     * @param supplier the command supplier.
+     * @return the command.
+     * @see DeferredCommand
+     */
+    default Command defer(Supplier<Command> supplier) {
+        return Commands.defer(supplier, List.of(this));
+    }
 }
