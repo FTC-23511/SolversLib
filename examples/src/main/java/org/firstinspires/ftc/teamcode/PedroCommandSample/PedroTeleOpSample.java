@@ -24,7 +24,7 @@ public class PedroTeleOpSample extends CommandOpMode {
         super.run();
 
         /* Robot-Centric Drive
-        follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
+        follower.setTeleOpDrive(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, true);
         */
 
         // Field-Centric Drive
