@@ -2,7 +2,6 @@ package com.seattlesolvers.solverslib.hardware;
 
 import android.graphics.Color;
 
-
 import androidx.annotation.NonNull;
 
 import com.qualcomm.hardware.rev.RevColorSensorV3;

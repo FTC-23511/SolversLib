@@ -108,15 +108,19 @@ public class MotorGroup extends Motor implements Iterable<Motor> {
     }
 
     @Override
-    public void setRunMode(RunMode runmode) {
+    public Motor setRunMode(RunMode runmode) {
         group[0].setRunMode(runmode);
+
+        return this;
     }
 
     @Override
-    public void setZeroPowerBehavior(ZeroPowerBehavior behavior) {
+    public Motor setZeroPowerBehavior(ZeroPowerBehavior behavior) {
         for (Motor motor : group) {
             motor.setZeroPowerBehavior(behavior);
         }
+
+        return this;
     }
 
     @Override
@@ -223,4 +227,7 @@ public class MotorGroup extends Motor implements Iterable<Motor> {
     public Motor getMotor() {
         return group[0];
     }
+
+
+
 }
