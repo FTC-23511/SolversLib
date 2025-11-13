@@ -5,13 +5,12 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.seattlesolvers.solverslib.controller.PController;
-import com.seattlesolvers.solverslib.controller.PIDController;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.hardware.HardwareDevice;
 
-import org.firstinspires.ftc.robotcore.external.navigation.CurrentUnit;
 
 import java.util.function.Supplier;
 
@@ -227,9 +226,9 @@ public class Motor implements HardwareDevice {
      */
     protected GoBILDA type;
 
-    protected PIDController veloController = new PIDController(1, 0, 0);
+    protected PIDFController veloController = new PIDFController(1, 0, 0, 0);
 
-    protected PController positionController = new PController(1);
+    protected PIDFController positionController = new PIDFController(1, 0 ,0, 0);
 
     protected SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 1, 0);
 
@@ -368,6 +367,10 @@ public class Motor implements HardwareDevice {
      */
     public double getPositionCoefficient() {
         return positionController.getP();
+    }
+
+    public double[] getPositionCoefficients() {
+        return positionController.getCoefficients();
     }
 
     /**
@@ -558,6 +561,10 @@ public class Motor implements HardwareDevice {
      */
     public void setPositionCoefficient(double kp) {
         positionController.setP(kp);
+    }
+
+    public void setCoefficients(PIDFCoefficients coefficients) {
+        positionController.setPIDF(coefficients.p, coefficients.i, coefficients.d, coefficients.f);
     }
 
     /**
