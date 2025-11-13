@@ -11,7 +11,7 @@ import com.seattlesolvers.solverslib.util.MathUtils;
 public class CoaxialSwerveModule {
     private final MotorEx motor;
     private final CRServoEx swervo;
-    private final double maxSpeed;
+    private double maxSpeed;
     private PIDFController swervoPIDF;
     // Angle that is tangential to the circle made by the 4 modules relative to the robot
     private final double tangentialAngle;
@@ -125,6 +125,10 @@ public class CoaxialSwerveModule {
 
     public void setSwervoPIDF(PIDFCoefficients pidfCoefficients) {
         this.swervoPIDF.setPIDF(pidfCoefficients.p, pidfCoefficients.i, pidfCoefficients.d, pidfCoefficients.f);
+    }
+
+    public void setMaxSpeed(double maxSpeed) {
+        this.maxSpeed = maxSpeed;
     }
 
     public double getAngleError() {

@@ -51,6 +51,14 @@ public class MotorGroup extends Motor implements Iterable<Motor> {
     }
 
     /**
+     * @return The speed of the group from the SDK object
+     */
+    @Override
+    public double getRawPower() {
+        return group[0].getRawPower();
+    }
+
+    /**
      * @return All motor target speeds as a percentage of output
      */
     public List<Double> getSpeeds() {
@@ -100,15 +108,19 @@ public class MotorGroup extends Motor implements Iterable<Motor> {
     }
 
     @Override
-    public void setRunMode(RunMode runmode) {
+    public Motor setRunMode(RunMode runmode) {
         group[0].setRunMode(runmode);
+
+        return this;
     }
 
     @Override
-    public void setZeroPowerBehavior(ZeroPowerBehavior behavior) {
+    public Motor setZeroPowerBehavior(ZeroPowerBehavior behavior) {
         for (Motor motor : group) {
             motor.setZeroPowerBehavior(behavior);
         }
+
+        return this;
     }
 
     @Override
@@ -211,5 +223,11 @@ public class MotorGroup extends Motor implements Iterable<Motor> {
             x.stopMotor();
         }
     }
+
+    public Motor getMotor() {
+        return group[0];
+    }
+
+
 
 }

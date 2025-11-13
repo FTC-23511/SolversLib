@@ -6,6 +6,8 @@ import java.util.List;
 
 /**
  * Performs spline interpolation given a set of control points.
+ *
+ * @author Arush - 23511 (for the additional constructor and chained calls)
  */
 public class InterpLUT {
 
@@ -19,12 +21,32 @@ public class InterpLUT {
         mM = m;
     }
 
+    public InterpLUT(List<Double> input, List<Double> output) {
+        if (input == null || output == null || input.size() != output.size() || input.size() < 2) {
+            throw new IllegalArgumentException("There must be at least two control "
+                    + "points and the arrays must be of equal length.");
+        }
+
+        for (int i = 0; i < input.size(); i++) {
+            mX.add(input.get(i));
+            mY.add(output.get(i));
+        }
+    }
+
     public InterpLUT() {
     }
 
-    public void add(double input, double output) {
+    /**
+     * Adds a control point to the LUT
+     * @param input the input value (x)
+     * @param output the output value (y)
+     * @return this class (for chaining calls)
+     */
+    public InterpLUT add(double input, double output) {
         mX.add(input);
         mY.add(output);
+
+        return this;
     }
 
     /**
@@ -35,9 +57,11 @@ public class InterpLUT {
      * monotonic (Y is non-decreasing or non-increasing) then the interpolated values will also be monotonic.
      *
      * @throws IllegalArgumentException if the X or Y arrays are null, have different lengths or have fewer than 2 values.
+     * @throws IllegalArgumentException if the X values are not strictly increasing.
+     * @return this class (for chaining calls)
      */
     //public static LUTWithInterpolator createLUT(List<Double> x, List<Double> y) {
-    public void createLUT() {
+    public InterpLUT createLUT() {
         List<Double> x = this.mX;
         List<Double> y = this.mY;
 
@@ -86,6 +110,8 @@ public class InterpLUT {
         mX = x;
         mY = y;
         mM = Arrays.asList(m);
+
+        return this;
     }
 
     /**

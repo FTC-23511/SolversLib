@@ -5,11 +5,12 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.seattlesolvers.solverslib.controller.PController;
-import com.seattlesolvers.solverslib.controller.PIDController;
+import com.seattlesolvers.solverslib.controller.PIDFController;
 import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.hardware.HardwareDevice;
+
 
 import java.util.function.Supplier;
 
@@ -225,15 +226,16 @@ public class Motor implements HardwareDevice {
      */
     protected GoBILDA type;
 
-    protected PIDController veloController = new PIDController(1, 0, 0);
+    protected PIDFController veloController = new PIDFController(1, 0, 0, 0);
 
-    protected PController positionController = new PController(1);
+    protected PIDFController positionController = new PIDFController(1, 0 ,0, 0);
 
     protected SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 1, 0);
 
     private boolean targetIsSet = false;
 
     protected double bufferFraction = 0.9;
+    protected double lastPower = 0;
 
     public Motor() {
     }
@@ -291,16 +293,19 @@ public class Motor implements HardwareDevice {
      * @param output The percentage of power to set. Value should be between -1.0 and 1.0.
      */
     public void set(double output) {
+        double power;
         if (runmode == RunMode.VelocityControl) {
             double speed = bufferFraction * output * ACHIEVABLE_MAX_TICKS_PER_SECOND;
             double velocity = veloController.calculate(getVelocity(), speed) + feedforward.calculate(speed, encoder.getAcceleration());
-            motor.setPower(velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND);
+            power = velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND;
         } else if (runmode == RunMode.PositionControl) {
             double error = positionController.calculate(getDistance());
-            motor.setPower(output * error);
+            power = output * error;
         } else {
-            motor.setPower(output);
+            power = output;
         }
+        motor.setPower(power);
+        lastPower = power;
     }
 
     /**
@@ -364,6 +369,10 @@ public class Motor implements HardwareDevice {
         return positionController.getP();
     }
 
+    public double[] getPositionCoefficients() {
+        return positionController.getCoefficients();
+    }
+
     /**
      * @return the feedforward coefficients
      */
@@ -376,8 +385,10 @@ public class Motor implements HardwareDevice {
      *
      * @param behavior the behavior desired
      */
-    public void setZeroPowerBehavior(ZeroPowerBehavior behavior) {
+    public Motor setZeroPowerBehavior(ZeroPowerBehavior behavior) {
         motor.setZeroPowerBehavior(behavior.getBehavior());
+
+        return this;
     }
 
     /**
@@ -425,7 +436,7 @@ public class Motor implements HardwareDevice {
      *
      * @param runmode the desired runmode
      */
-    public void setRunMode(RunMode runmode) {
+    public Motor setRunMode(RunMode runmode) {
         this.runmode = runmode;
         veloController.reset();
         positionController.reset();
@@ -433,6 +444,8 @@ public class Motor implements HardwareDevice {
             setTargetPosition(getCurrentPosition());
             targetIsSet = false;
         }
+
+        return this;
     }
 
     protected double getVelocity() {
@@ -442,9 +455,18 @@ public class Motor implements HardwareDevice {
     /**
      * Common method for getting the current set speed of a motor.
      *
-     * @return The current set speed. Value is between -1.0 and 1.0.
+     * @return The current set speed. Value is between -1.0 and 1.0. Based on last power set to the SolversLib Motor object.
      */
     public double get() {
+        return lastPower;
+    }
+
+    /**
+     * Method for getting the current set speed of a motor.
+     *
+     * @return The current set speed. Value is between -1.0 and 1.0. Based on last power set to the internal SDK Motor object.
+     */
+    public double getRawPower() {
         return motor.getPower();
     }
 
@@ -539,6 +561,10 @@ public class Motor implements HardwareDevice {
      */
     public void setPositionCoefficient(double kp) {
         positionController.setP(kp);
+    }
+
+    public void setCoefficients(PIDFCoefficients coefficients) {
+        positionController.setPIDF(coefficients.p, coefficients.i, coefficients.d, coefficients.f);
     }
 
     /**

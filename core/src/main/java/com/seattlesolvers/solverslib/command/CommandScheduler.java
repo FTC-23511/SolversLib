@@ -317,11 +317,9 @@ public final class CommandScheduler {
      *                    potentially leading to worse loop times.
      */
     public void setBulkReading(HardwareMap hwMap, LynxModule.BulkCachingMode cachingMode) {
-        if (!cachingMode.equals(LynxModule.BulkCachingMode.OFF)) {
-            allHubs = hwMap.getAll(LynxModule.class);
-            for (LynxModule hub : allHubs) {
-                hub.setBulkCachingMode(cachingMode);
-            }
+        allHubs = hwMap.getAll(LynxModule.class);
+        for (LynxModule hub : allHubs) {
+            hub.setBulkCachingMode(cachingMode);
         }
 
         clearHubCache = cachingMode.equals(LynxModule.BulkCachingMode.MANUAL);
@@ -437,6 +435,15 @@ public final class CommandScheduler {
      */
     public Command requiring(Subsystem subsystem) {
         return m_requirements.get(subsystem);
+    }
+
+    /**
+     * Returns if a subsystem is not being used by any command currently.
+     * @param subsystem the subsystem to be inquired about
+     * @return if the subsystem is currently not being used by any command
+     */
+    public boolean isAvailable(Subsystem subsystem) {
+        return requiring(subsystem) == null;
     }
 
     /**

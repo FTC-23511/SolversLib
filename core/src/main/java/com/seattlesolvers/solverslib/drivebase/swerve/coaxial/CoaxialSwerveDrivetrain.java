@@ -26,8 +26,7 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
      * @param motors the motors corresponding with the individual modules, starting from front-right going counterclockwise
      * @param swervos the swervos corresponding with the individual modules, starting from front-right going counterclockwise, and properly constructed with absolute encoders and their offsets so that the wheel/pod moves the robot forward with a positive motor power when the returned angle is 0
      */
-    public CoaxialSwerveDrivetrain(double trackWidth, double wheelBase, double maxSpeed, PIDFCoefficients swervoPIDFCoefficients, MotorEx[] motors, CRServoEx[] swervos) {
-        setMaxSpeed(maxSpeed);
+    public CoaxialSwerveDrivetrain(double trackWidth, double wheelBase, double maxSpeed, PIDFCoefficients swervoPIDFCoefficients, MotorEx[] motors, CRServoEx[] swervos) {;
         if (motors.length != 4 || swervos.length != 4) {
             throw new IllegalArgumentException("Hardware lists for swerve modules must have exactly 4 objects each");
         }
@@ -47,6 +46,7 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
         this.modules[1] = new CoaxialSwerveModule(motors[1], swervos[1], new Vector2d(-trackWidth / 2, wheelBase / 2), maxSpeed, swervoPIDFCoefficients);
         this.modules[2] = new CoaxialSwerveModule(motors[2], swervos[2], new Vector2d(-trackWidth / 2, -wheelBase / 2), maxSpeed, swervoPIDFCoefficients);
         this.modules[3] = new CoaxialSwerveModule(motors[3], swervos[3], new Vector2d(trackWidth / 2, -wheelBase / 2), maxSpeed, swervoPIDFCoefficients);
+        setMaxSpeed(maxSpeed);
     }
 
     /**
@@ -107,7 +107,6 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
     /**
      * Updates the modules/drivetrain to create an X (useful for preventing being pushed on the field)
      */
-    // TODO: Actually test this to make sure it works
     public void updateWithXLock() {
         for (int i = 0; i < modules.length; i++) {
             double angle = (-Math.PI / 4) + (Math.PI/2 * i);
@@ -117,6 +116,14 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
             );
         }
     }
+
+    @Override
+    public void setMaxSpeed(double maxSpeed) {
+        for (CoaxialSwerveModule module : modules) {
+            module.setMaxSpeed(maxSpeed);
+        }
+    }
+
 
     @Override
     public void stop() {

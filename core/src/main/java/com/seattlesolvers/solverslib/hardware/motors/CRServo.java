@@ -34,10 +34,11 @@ public class CRServo extends Motor {
     @Override
     public void set(double output) {
         crServo.setPower(output);
+        lastPower = output;
     }
 
     @Override
-    public double get() {
+    public double getRawPower() {
         return crServo.getPower();
     }
 

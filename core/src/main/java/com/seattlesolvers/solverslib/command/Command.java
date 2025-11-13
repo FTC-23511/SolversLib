@@ -53,6 +53,15 @@ public interface Command {
     default boolean isFinished() {
         return false;
     }
+    /**
+     * Whether the given command should run when the robot is disabled.  Override to return true
+     * if the command should run when disabled.
+     *
+     * @return whether the command should run when the robot is disabled
+     */
+    default boolean runsWhenDisabled() {
+        return false;
+    }
 
     /**
      * Specifies the set of subsystems used by this command.  Two commands cannot use the same
@@ -303,16 +312,6 @@ public interface Command {
      */
     default boolean isScheduled() {
         return CommandScheduler.getInstance().isScheduled(this);
-    }
-
-    /**
-     * Whether the given command should run when the robot is disabled.  Override to return true
-     * if the command should run when disabled.
-     *
-     * @return whether the command should run when the robot is disabled
-     */
-    default boolean runsWhenDisabled() {
-        return false;
     }
 
     default String getName() {

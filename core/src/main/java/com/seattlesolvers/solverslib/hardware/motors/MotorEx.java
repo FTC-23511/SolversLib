@@ -128,6 +128,7 @@ public class MotorEx extends Motor {
      */
     private void setPower(double power) {
         if ((Math.abs(power - motorEx.getPower()) > cachingTolerance) || (power == 0 && motorEx.getPower() != 0)) {
+            lastPower = power;
             motorEx.setPower(power);
         }
     }
@@ -155,8 +156,10 @@ public class MotorEx extends Motor {
      * @param current the current alert to set
      * @param unit the unit to set the current alert in
      */
-    public void setCurrentAlert(double current, CurrentUnit unit) {
+    public MotorEx setCurrentAlert(double current, CurrentUnit unit) {
         motorEx.setCurrentAlert(current, unit);
+
+        return this;
     }
 
     /**

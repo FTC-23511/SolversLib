@@ -10,8 +10,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
  * some of these methods do.
  */
 public class Pose2d {
-    private final Translation2d m_translation;
-    private final Rotation2d m_rotation;
+    private Translation2d m_translation;
+    private Rotation2d m_rotation;
 
     /**
      * Constructs a pose at the origin facing toward the positive X axis.
@@ -260,10 +260,28 @@ public class Pose2d {
     }
 
     /**
+     * Flips and updates this pose's values (including heading) across x=0 using the static method {@link Pose2d#mirrorPose(Pose2d)}
+     */
+    public void mirror() {
+        Pose2d mirrored = mirrorPose(this);
+        m_translation = mirrored.getTranslation();
+        m_rotation = mirrored.getRotation();
+    }
+
+    /**
      * Converts SolversLib's Pose2d objects into the SDK's Pose2D objects
      * @return the SDK Pose2D object
      */
     public static Pose2D convertToPose2D(Pose2d pose, DistanceUnit distanceUnit, AngleUnit angleUnit) {
         return new Pose2D(distanceUnit, pose.getX(), pose.getY(), angleUnit, pose.getHeading());
+    }
+
+    /**
+     * Reflects poses across x=0 (including heading), assuming heading is scaled from zero to max
+     * @param pose pose to be flipped
+     * @return flipped pose
+     */
+    public static Pose2d mirrorPose(Pose2d pose) {
+        return new Pose2d(-pose.getX(), pose.getY(), Math.atan2(Math.sin(pose.getHeading()), -Math.cos(pose.getHeading())));
     }
 }

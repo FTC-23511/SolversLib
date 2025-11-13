@@ -19,6 +19,10 @@ public class GamepadEx {
 
     private HashMap<Button, ButtonReader> buttonReaders;
     private HashMap<Button, GamepadButton> gamepadButtons;
+    private SlewRateLimiter LX = null;
+    private SlewRateLimiter LY = null;
+    private SlewRateLimiter RX = null;
+    private SlewRateLimiter RY = null;
 
     private final Button[] buttons = {
             Button.Y, Button.X, Button.A, Button.B, Button.LEFT_BUMPER, Button.RIGHT_BUMPER, Button.BACK,
@@ -142,31 +146,61 @@ public class GamepadEx {
     }
 
     /**
+     * Enables and sets the slew rate limiting for the joysticks.
+     * Parameters are labelled by L/R for left/right joystick on the controller and X/Y for axis of joystick movement.
+     * Set any parameters not to be enabled/used as null.
+     * @return this object for chaining purposes
+     */
+    public GamepadEx setJoystickSlewRateLimiters(SlewRateLimiter LX, SlewRateLimiter LY, SlewRateLimiter RX, SlewRateLimiter RY) {
+        this.LX = LX;
+        this.LY = LY;
+        this.RX = RX;
+        this.RY = RY;
+        return this;
+    }
+
+    /**
      * @return the y-value on the left analog stick
      */
     public double getLeftY() {
-        return -gamepad.left_stick_y;
+        if (LY == null) {
+            return -gamepad.left_stick_y;
+        } else {
+            return LY.calculate(-gamepad.left_stick_y);
+        }
     }
 
     /**
      * @return the y-value on the right analog stick
      */
     public double getRightY() {
-        return gamepad.right_stick_y;
+        if (RY == null) {
+            return gamepad.right_stick_y;
+        } else {
+            return RY.calculate(gamepad.right_stick_y);
+        }
     }
 
     /**
      * @return the x-value on the left analog stick
      */
     public double getLeftX() {
-        return gamepad.left_stick_x;
+        if (LX == null) {
+            return gamepad.left_stick_x;
+        } else {
+            return LX.calculate(gamepad.left_stick_x);
+        }
     }
 
     /**
      * @return the x-value on the right analog stick
      */
     public double getRightX() {
-        return gamepad.right_stick_x;
+        if (RX == null) {
+            return gamepad.right_stick_x;
+        } else {
+            return RX.calculate(gamepad.right_stick_x);
+        }
     }
 
     /**
