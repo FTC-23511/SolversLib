@@ -63,7 +63,7 @@ public class MotorEx extends Motor {
             double velocity = veloController.calculate(getCorrectedVelocity(), speed) + feedforward.calculate(speed, getAcceleration());
             setPower(velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND);
         } else if (runmode == RunMode.PositionControl) {
-            double error = positionController.calculate(encoder.getPosition());
+            double error = positionController.calculate(encoder.getDistance());
             setPower(output * error);
         } else {
             setPower(output);
