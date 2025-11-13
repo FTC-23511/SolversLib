@@ -28,8 +28,9 @@ public abstract class CommandBase implements Command {
      *
      * @param requirements the requirements to add
      */
-    public final void addRequirements(Subsystem... requirements) {
+    public CommandBase addRequirements(Subsystem... requirements) {
         m_requirements.addAll(Arrays.asList(requirements));
+        return this;
     }
 
     @Override
@@ -41,16 +42,18 @@ public abstract class CommandBase implements Command {
         return m_name;
     }
 
-    public void setName(String name) {
+    public CommandBase setName(String name) {
         m_name = name;
+        return this;
     }
 
     public String getSubsystem() {
         return m_subsystem;
     }
 
-    public void setSubsystem(String subsystem) {
+    public CommandBase setSubsystem(String subsystem) {
         m_subsystem = subsystem;
+        return this;
     }
 
 }
