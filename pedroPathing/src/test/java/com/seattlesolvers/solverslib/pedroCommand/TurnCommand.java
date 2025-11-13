@@ -12,7 +12,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
  * @author Arush - FTC 23511
  */
 public class TurnCommand extends CommandBase {
-
     private final Follower follower;
     private final double angle;
     private final boolean isLeft;
