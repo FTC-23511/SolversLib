@@ -1,7 +1,6 @@
 package com.seattlesolvers.solverslib.pedroCommand;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierPoint;
 import com.pedropathing.geometry.Pose;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
