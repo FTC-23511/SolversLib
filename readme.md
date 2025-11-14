@@ -11,6 +11,7 @@ Project led by FTC 23511, Seattle Solvers.
 - Oscar C - [Dairy Foundation](https://github.com/Dairy-Foundation)
   - Special thanks to Oscar for hosting SolversLib on the Dairy Foundation!
 - Noam - [FTC 23644](https://www.youtube.com/@SkeletonArmy23644)
+- Daniel - FTC 7854
 - Nv7 - [FTC 21229](https://www.stem-bridge.org/home)
 - Lucas B - FTC 15215, 22407, and 24736
 - Suchir R - [FTC 194482](https://www.instagram.com/xbots_ftc/)

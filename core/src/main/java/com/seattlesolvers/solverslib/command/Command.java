@@ -53,15 +53,6 @@ public interface Command {
     default boolean isFinished() {
         return false;
     }
-    /**
-     * Whether the given command should run when the robot is disabled.  Override to return true
-     * if the command should run when disabled.
-     *
-     * @return whether the command should run when the robot is disabled
-     */
-    default boolean runsWhenDisabled() {
-        return false;
-    }
 
     /**
      * Specifies the set of subsystems used by this command.  Two commands cannot use the same
@@ -314,8 +305,48 @@ public interface Command {
         return CommandScheduler.getInstance().isScheduled(this);
     }
 
+    /**
+     * Whether the given command should run when the robot is disabled.  Override to return true
+     * if the command should run when disabled.
+     *
+     * @return whether the command should run when the robot is disabled
+     */
+    default boolean runsWhenDisabled() {
+        return false;
+    }
+
+    /**
+     * Sets this command as uninterruptible.
+     * Wraps the command in {@link UninterruptibleCommand} internally.
+     * @return the decorated command
+     */
+    default Command uninterruptible() {
+        return new UninterruptibleCommand(this);
+    }
+
+    /**
+     * Adds a callback with a boolean supplier
+     * @param condition Runs the runnable the first time this is true
+     * @param runnable Callback to run
+     * @return the decorated command
+     */
+    default Command when(BooleanSupplier condition, Runnable runnable) {
+        return new CallbackCommand<>(this).when(condition, runnable);
+    }
+
+    /**
+     * An overloaded decorator of {@link Command#when(BooleanSupplier, Runnable)} that takes a command
+     *
+     * Adds a callback with a boolean supplier
+     * @param condition Schedules the command the first time this is true
+     * @param command Command to schedule
+     * @return the decorated command
+     */
+    default Command when(BooleanSupplier condition, Command command) {
+        return new CallbackCommand<>(this).when(condition, command);
+    }
+
     default String getName() {
         return this.getClass().getSimpleName();
     }
-
 }
