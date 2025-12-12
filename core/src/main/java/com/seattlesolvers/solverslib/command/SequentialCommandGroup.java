@@ -103,4 +103,7 @@ public class SequentialCommandGroup extends CommandGroupBase {
         return m_runWhenDisabled;
     }
 
+    public String getCurrentCommandName(){
+        return m_commands.get(m_currentCommandIndex).getName();
+    }
 }
