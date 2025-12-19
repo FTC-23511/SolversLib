@@ -88,4 +88,8 @@ public final class MathUtils {
             return 360;
         }
     }
+
+    public static double sqrtWithSig(double val) {
+        return Math.sqrt(Math.abs(val)) * Math.signum(val);
+    }
 }
