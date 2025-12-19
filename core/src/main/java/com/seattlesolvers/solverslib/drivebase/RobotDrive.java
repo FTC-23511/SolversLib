@@ -48,6 +48,17 @@ public abstract class RobotDrive {
     }
 
     /**
+     * Returns the current max output
+     *
+     * <p>The default value is {@value #kDefaultMaxSpeed}.</p>
+     *
+     * @return maxOutput Current max output.
+     */
+    public double getMaxSpeed() {
+        return this.maxOutput;
+    }
+
+    /**
      * Sets the clipped range for the drive inputs.
      *
      * <p>The default clip range is {@value #kDefaultRangeMin} to {@value #kDefaultRangeMax}.

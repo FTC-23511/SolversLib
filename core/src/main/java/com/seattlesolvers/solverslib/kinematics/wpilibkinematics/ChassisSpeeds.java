@@ -59,6 +59,34 @@ public class ChassisSpeeds {
         this.omegaRadiansPerSecond = omegaRadiansPerSecond;
     }
 
+    public ChassisSpeeds(ChassisSpeeds chassisSpeeds) {
+        this.vxMetersPerSecond = chassisSpeeds.vxMetersPerSecond;
+        this.vyMetersPerSecond = chassisSpeeds.vyMetersPerSecond;
+        this.omegaRadiansPerSecond = chassisSpeeds.omegaRadiansPerSecond;
+    }
+
+    /**
+     * Scales all values of the ChassisSpeeds object by a scalar. <br>
+     * Note: MODIFIES INTERNAL VALUES! If you want a new object, use {@link ChassisSpeeds#scale(ChassisSpeeds, double)}.
+     * @param factor the scalar
+     */
+    public ChassisSpeeds scale(double factor) {
+        vxMetersPerSecond *= factor;
+        vyMetersPerSecond *= factor;
+        omegaRadiansPerSecond *= factor;
+        return this;
+    }
+
+    /**
+     * Returns a new ChassisSpeeds object with all values scaled by a scalar. <br>
+     * @param chassisSpeeds the original ChassisSpeeds object to base the scalar off
+     * @param factor the scalar
+     */
+    public static ChassisSpeeds scale(ChassisSpeeds chassisSpeeds, double factor) {
+        ChassisSpeeds copy = new ChassisSpeeds(chassisSpeeds);
+        return new ChassisSpeeds(copy.scale(factor));
+    }
+
     /**
      * Converts a user provided field-relative set of speeds into a robot-relative
      * ChassisSpeeds object.
@@ -90,7 +118,7 @@ public class ChassisSpeeds {
 
     @Override
     public String toString() {
-        return String.format("ChassisSpeeds(Vx: %.2f m/s, Vy: %.2f m/s, Omega: %.2f rad/s)",
+        return String.format("ChassisSpeeds(Vx=%.2f m/s,Vy=%.2f m/s,Omega=%.2f rad/s)",
                 vxMetersPerSecond, vyMetersPerSecond, omegaRadiansPerSecond);
     }
 

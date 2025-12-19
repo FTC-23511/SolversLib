@@ -14,6 +14,8 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
     private final double trackWidth;
     // Front-back c2c distance between pods
     private final double wheelBase;
+    private final double maxSpeed; // max speed of robot in inches/second when all motors are set to max power, not to be confused with maxOutput which is a scalar from 0 to 1
+    private final double maxAngularSpeed; // max speed of robot in radians/second when all motors are set to max power to spin the robot in place
     private ChassisSpeeds targetVelocity = new ChassisSpeeds();
 
     /**
@@ -36,6 +38,8 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
 
         this.trackWidth = trackWidth;
         this.wheelBase = wheelBase;
+        this.maxSpeed = maxSpeed;
+        this.maxAngularSpeed = maxSpeed / Math.hypot(trackWidth / 2, wheelBase / 2);
 
         for (Motor motor : motors) {
             motor.setRunMode(Motor.RunMode.RawPower);
@@ -46,7 +50,6 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
         this.modules[1] = new CoaxialSwerveModule(motors[1], swervos[1], new Vector2d(-trackWidth / 2, wheelBase / 2), maxSpeed, swervoPIDFCoefficients);
         this.modules[2] = new CoaxialSwerveModule(motors[2], swervos[2], new Vector2d(-trackWidth / 2, -wheelBase / 2), maxSpeed, swervoPIDFCoefficients);
         this.modules[3] = new CoaxialSwerveModule(motors[3], swervos[3], new Vector2d(trackWidth / 2, -wheelBase / 2), maxSpeed, swervoPIDFCoefficients);
-        setMaxSpeed(maxSpeed);
     }
 
     /**
@@ -64,10 +67,28 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
     }
 
     /**
+     * Sets the target velocity the drivetrain should move at (robot-centric), while also limited by {@link #setMaxSpeed(double)}
      * @param targetVelocity the target velocity the drivetrain should move at (robot-centric)
      */
     public void setTargetVelocity(ChassisSpeeds targetVelocity) {
-        this.targetVelocity = targetVelocity;
+        double maxScaleOverOutput = 1;
+        double maxAllowedLinearSpeed = maxSpeed * maxOutput;
+        double maxAllowedAngularSpeed = maxAngularSpeed * maxOutput;
+        if (Math.abs(targetVelocity.vxMetersPerSecond / maxAllowedLinearSpeed) > maxScaleOverOutput) {
+            maxScaleOverOutput = Math.abs(targetVelocity.vxMetersPerSecond / maxAllowedLinearSpeed);
+        }
+        if (Math.abs(targetVelocity.vyMetersPerSecond / maxAllowedLinearSpeed) > maxScaleOverOutput) {
+            maxScaleOverOutput = Math.abs(targetVelocity.vyMetersPerSecond / maxAllowedLinearSpeed);
+        }
+        if (Math.abs(targetVelocity.omegaRadiansPerSecond / maxAllowedAngularSpeed) > maxScaleOverOutput) {
+            maxScaleOverOutput = Math.abs(targetVelocity.omegaRadiansPerSecond / maxAllowedAngularSpeed);
+        }
+        
+        this.targetVelocity = new ChassisSpeeds(
+                targetVelocity.vxMetersPerSecond / maxScaleOverOutput,
+                targetVelocity.vyMetersPerSecond / maxScaleOverOutput,
+                targetVelocity.omegaRadiansPerSecond / maxScaleOverOutput
+        );
     }
 
     /**
@@ -116,14 +137,6 @@ public class CoaxialSwerveDrivetrain extends RobotDrive {
             );
         }
     }
-
-    @Override
-    public void setMaxSpeed(double maxSpeed) {
-        for (CoaxialSwerveModule module : modules) {
-            module.setMaxSpeed(maxSpeed);
-        }
-    }
-
 
     @Override
     public void stop() {

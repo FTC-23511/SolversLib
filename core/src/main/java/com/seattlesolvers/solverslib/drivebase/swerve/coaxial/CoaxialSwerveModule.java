@@ -114,9 +114,9 @@ public class CoaxialSwerveModule {
     }
 
     public String getPowerTelemetry() {
-        return "Motor: " + MathUtils.round(motor.get(), 3) +
-                "; Servo: " + MathUtils.round(swervo.get(), 3) +
-                "; Absolute Encoder: " + MathUtils.round(swervo.getAbsoluteEncoder().getCurrentPosition(), 3);
+        return "Motor=" + MathUtils.round(motor.get(), 3) +
+                ",Servo=" + MathUtils.round(swervo.get(), 3) +
+                ",Absolute Encoder=" + MathUtils.round(swervo.getAbsoluteEncoder().getCurrentPosition(), 3);
     }
 
     public Vector2d getTargetVelocity() {
@@ -125,10 +125,6 @@ public class CoaxialSwerveModule {
 
     public void setSwervoPIDF(PIDFCoefficients pidfCoefficients) {
         this.swervoPIDF.setPIDF(pidfCoefficients.p, pidfCoefficients.i, pidfCoefficients.d, pidfCoefficients.f);
-    }
-
-    public void setMaxSpeed(double maxSpeed) {
-        this.maxSpeed = maxSpeed;
     }
 
     public double getAngleError() {
