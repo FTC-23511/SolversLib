@@ -2,6 +2,7 @@ package com.seattlesolvers.solverslib.hardware;
 
 import com.qualcomm.robotcore.hardware.AnalogInput;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import com.seattlesolvers.solverslib.util.MathUtils;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -19,6 +20,9 @@ public class AbsoluteAnalogEncoder implements HardwareDevice {
     private final double range;
     private final AngleUnit angleUnit;
     private boolean reversed;
+    private ElapsedTime timer = new ElapsedTime();
+    private double lastPos;
+    private double vel = 0;
 
     /**
      * The constructor for absolute analog encoders
@@ -75,11 +79,19 @@ public class AbsoluteAnalogEncoder implements HardwareDevice {
      * @return The normalized angular position of the encoder in the unit previously specified by the user from 0 to max
      */
     public double getCurrentPosition() {
-        return MathUtils.normalizeAngle(
+        double newPos = MathUtils.normalizeAngle(
                 (!reversed ? 1 - getVoltage() / range : getVoltage() / range) * MathUtils.returnMaxForAngleUnit(angleUnit) - offset,
                 true,
                 angleUnit
         );
+        vel = (newPos - lastPos) / timer.seconds();
+        timer.reset();
+        lastPos = newPos;
+        return lastPos;
+    }
+
+    public double getVelocity() {
+        return vel;
     }
 
     /**

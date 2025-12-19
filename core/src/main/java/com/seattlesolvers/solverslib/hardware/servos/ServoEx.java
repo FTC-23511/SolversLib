@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.ServoControllerEx;
 import com.seattlesolvers.solverslib.hardware.HardwareDevice;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-
 /**
  * An extended Servo wrapper class which implements utility features such as
  * caching to reduce loop times and custom angle ranges.

@@ -174,8 +174,9 @@ public class CRServoEx extends CRServo {
      * @param power power to be assigned to the servo if difference is greater than caching tolerance or if power is exactly 0
      */
     private void setPower(double power) {
-        if ((Math.abs(power - crServo.getPower()) > cachingTolerance) || (power == 0 && crServo.getPower() != 0)) {
+        if ((Math.abs(power - lastPower) > cachingTolerance) || (power == 0 && lastPower != 0)) {
             crServo.setPower(power);
+            lastPower = power;
         }
     }
 

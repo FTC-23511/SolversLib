@@ -5,12 +5,11 @@ import androidx.annotation.NonNull;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
-import com.seattlesolvers.solverslib.controller.PIDFController;
+import com.seattlesolvers.solverslib.controller.PController;
+import com.seattlesolvers.solverslib.controller.PIDController;
 import com.seattlesolvers.solverslib.controller.wpilibcontroller.SimpleMotorFeedforward;
 import com.seattlesolvers.solverslib.hardware.HardwareDevice;
-
 
 import java.util.function.Supplier;
 
@@ -158,7 +157,7 @@ public class Motor implements HardwareDevice {
                 lastVelo = velo;
                 lastTimeStamp = currentTime;
             }
-            return velo;
+            return velo * direction.getMultiplier();
         }
 
         /**
@@ -177,10 +176,11 @@ public class Motor implements HardwareDevice {
          */
         public double getCorrectedVelocity() {
             double real = getRawVelocity();
-            while (Math.abs(veloEstimate - real) > CPS_STEP / 2.0) {
-                real += Math.signum(veloEstimate - real) * CPS_STEP;
+            double abs = Math.abs(real);
+            while (Math.abs(veloEstimate - abs) > CPS_STEP / 2.0) {
+                abs += Math.signum(veloEstimate - abs) * CPS_STEP;
             }
-            return real;
+            return abs * Math.signum(real);
         }
 
     }
@@ -226,9 +226,9 @@ public class Motor implements HardwareDevice {
      */
     protected GoBILDA type;
 
-    protected PIDFController veloController = new PIDFController(1, 0, 0, 0);
+    protected PIDController veloController = new PIDController(1, 0, 0);
 
-    protected PIDFController positionController = new PIDFController(1, 0 ,0, 0);
+    protected PController positionController = new PController(1);
 
     protected SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(0, 1, 0);
 
@@ -367,10 +367,6 @@ public class Motor implements HardwareDevice {
      */
     public double getPositionCoefficient() {
         return positionController.getP();
-    }
-
-    public double[] getPositionCoefficients() {
-        return positionController.getCoefficients();
     }
 
     /**
@@ -563,10 +559,6 @@ public class Motor implements HardwareDevice {
         positionController.setP(kp);
     }
 
-    public void setCoefficients(PIDFCoefficients coefficients) {
-        positionController.setPIDF(coefficients.p, coefficients.i, coefficients.d, coefficients.f);
-    }
-
     /**
      * Disable the motor.
      */
@@ -588,5 +580,4 @@ public class Motor implements HardwareDevice {
     public void stopMotor() {
         motor.setPower(0);
     }
-
 }
