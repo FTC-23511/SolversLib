@@ -22,6 +22,7 @@ dependencies {
     implementation("org.ejml:ejml-simple:0.39") {
         exclude(group = "org.ejml", module = "ejml-all")
     }
+    testImplementation("org.mockito:mockito-core:4.9.0")
 }
 
 dairyPublishing {
