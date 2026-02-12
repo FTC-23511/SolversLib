@@ -4,7 +4,7 @@ plugins {
     id("dev.frozenmilk.doc") version "0.0.5"
 }
 
-android.namespace = "org.solverslib.core"
+android.namespace = "org.solverslib.vision"
 
 dairyPublishing {
     gitDir = file("..")
@@ -17,27 +17,21 @@ ftc {
         implementation(RobotCore)
         implementation(FtcCommon)
         implementation(Hardware)
+        implementation(Vision)
 
         testImplementation(RobotCore)
     }
-}
 
-dependencies {
-    implementation("org.ejml:ejml-simple:0.39") {
-        exclude(group = "org.ejml", module = "ejml-all")
+    solvers {
+        api(core(dairyPublishing.version))
     }
-    //noinspection GradleDependency
-    implementation("androidx.core:core:1.2.0")
-    testImplementation("org.mockito:mockito-core:4.9.0")
-    testImplementation("junit:junit:4.13.2")
 }
 
 publishing {
     publications {
         register<MavenPublication>("release") {
             groupId = "org.solverslib"
-            artifactId = "core"
-            // note that version was previously 2.1.1
+            artifactId = "vision"
 
             artifact(dairyDoc.dokkaHtmlJar)
             artifact(dairyDoc.dokkaJavadocJar)

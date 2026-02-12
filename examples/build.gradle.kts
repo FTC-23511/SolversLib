@@ -1,21 +1,23 @@
 plugins {
-    id("dev.frozenmilk.teamcode") version "10.3.0-0.1.4"
+    id("dev.frozenmilk.teamcode") version "11.1.0-1.1.1"
 }
 
 ftc {
-    kotlin
+    kotlin()
 
-    // note: sdk automatically added
+    sdk.TeamCode()
+
+    solvers {
+        implementation(core(""))
+        implementation(pedroPathing(""))
+    }
+
+    pedro {
+        implementation(ftc)
+    }
 }
 
+// TODO: migrate once vision is published as part of easy auto libraries
 dependencies {
-    implementation("org.solverslib:core")
-    implementation("org.solverslib:pedroPathing")
-
-    implementation("com.pedropathing:ftc:2.0.3")
-}
-
-repositories {
-    maven("https://maven.brott.dev/")
-    maven("https://maven.pedropathing.com/")
+    implementation("org.solverslib:vision")
 }

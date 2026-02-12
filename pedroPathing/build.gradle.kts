@@ -1,20 +1,32 @@
 plugins {
-    id("dev.frozenmilk.android-library") version "10.3.0-0.1.4"
-    id("dev.frozenmilk.publish") version "0.0.4"
-    id("dev.frozenmilk.doc") version "0.0.4"
+    id("dev.frozenmilk.android-library") version "11.1.0-1.1.1"
+    id("dev.frozenmilk.publish") version "0.0.5"
+    id("dev.frozenmilk.doc") version "0.0.5"
 }
 
 android.namespace = "org.solverslib.pedroPathing"
 
+dairyPublishing {
+    gitDir = file("..")
+}
+
 ftc {
-    kotlin
+    kotlin()
 
     sdk {
-        RobotCore {
-            configurationNames += "testImplementation"
-        }
-        FtcCommon
-        Hardware
+        implementation(RobotCore)
+        implementation(FtcCommon)
+        implementation(Hardware)
+
+        testImplementation(RobotCore)
+    }
+
+    solvers {
+        api(core(dairyPublishing.version))
+    }
+
+    pedro {
+        implementation(ftc)
     }
 }
 
@@ -22,19 +34,6 @@ dependencies {
     implementation("org.ejml:ejml-simple:0.39") {
         exclude(group = "org.ejml", module = "ejml-all")
     }
-    implementation("com.pedropathing:ftc:2.0.4")
-
-    afterEvaluate {
-        api("org.solverslib:core:$version")
-    }
-}
-
-repositories {
-    maven("https://maven.brott.dev/")
-}
-
-dairyPublishing {
-    gitDir = file("..")
 }
 
 publishing {
