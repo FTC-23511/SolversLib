@@ -149,9 +149,9 @@ public class Motor implements HardwareDevice {
          */
         public double getRawVelocity() {
             double velo = getVelocity();
-            if (velo != lastVelo) {
-                double currentTime = (double) System.nanoTime() / 1E9;
-                double dt = currentTime - lastTimeStamp;
+            double currentTime = (double) System.nanoTime() / 1E9;
+            double dt = currentTime - lastTimeStamp;
+            if (dt > 1E-4) {
                 accel = (velo - lastVelo) / dt;
                 lastVelo = velo;
                 lastTimeStamp = currentTime;
@@ -417,13 +417,13 @@ public class Motor implements HardwareDevice {
     /**
      * Set the buffer for the motor. This adds a fractional value to the velocity control.
      *
-     * @param fraction a fractional value between (0, 1].
+     * @param bufferFraction a fractional value between (0, 1].
      */
-    public void setBuffer(double fraction) {
-        if (fraction <= 0 || fraction > 1) {
+    public void setBuffer(double bufferFraction) {
+        if (bufferFraction <= 0 || bufferFraction > 1) {
             throw new IllegalArgumentException("Buffer must be between 0 and 1, exclusive to 0");
         }
-        bufferFraction = fraction;
+        this.bufferFraction = bufferFraction;
     }
 
     /**
