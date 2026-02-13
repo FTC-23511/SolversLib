@@ -295,7 +295,7 @@ public class Motor implements HardwareDevice {
         double power;
         if (runmode == RunMode.VelocityControl) {
             double speed = bufferFraction * output * ACHIEVABLE_MAX_TICKS_PER_SECOND;
-            double velocity = veloController.calculate(getVelocity(), speed) + feedforward.calculate(speed, encoder.getAcceleration());
+            double velocity = veloController.calculate(getVelocity(), speed) + feedforward.calculate(speed);
             power = velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND;
         } else if (runmode == RunMode.PositionControl) {
             double error = positionController.calculate(getDistance());
