@@ -4,7 +4,7 @@ plugins {
     id("dev.frozenmilk.doc") version "0.0.5"
 }
 
-android.namespace = "org.solverslib.vision"
+android.namespace = "org.solverslib.photon"
 
 dairyPublishing {
     gitDir = file("..")
@@ -17,7 +17,6 @@ ftc {
         implementation(RobotCore)
         implementation(FtcCommon)
         implementation(Hardware)
-        implementation(Vision)
 
         testImplementation(RobotCore)
     }
@@ -31,7 +30,7 @@ publishing {
     publications {
         register<MavenPublication>("release") {
             groupId = "org.solverslib"
-            artifactId = "vision"
+            artifactId = "photon"
 
             artifact(dairyDoc.dokkaHtmlJar)
             artifact(dairyDoc.dokkaJavadocJar)

@@ -17,7 +17,7 @@ ftc {
     }
 }
 
-// TODO: migrate once vision is published as part of easy auto libraries
+// TODO: migrate once photon is published as part of easy auto libraries
 dependencies {
-    implementation("org.solverslib:vision")
+    implementation("org.solverslib:photon")
 }
