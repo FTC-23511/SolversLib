@@ -118,6 +118,15 @@ public class Motor implements HardwareDevice {
             resetVal += getPosition();
         }
 
+
+        /**
+         * Sets the encoder position reset position a custom value.
+         */
+        public Encoder overrideResetPos(int position) {
+            resetVal = position;
+            return this;
+        }
+
         /**
          * Sets the distance per pulse of the encoder.
          *
@@ -133,8 +142,9 @@ public class Motor implements HardwareDevice {
          *
          * @param direction the desired direction
          */
-        public void setDirection(Direction direction) {
+        public Encoder setDirection(Direction direction) {
             this.direction = direction;
+            return this;
         }
 
         /**
@@ -295,7 +305,7 @@ public class Motor implements HardwareDevice {
         double power;
         if (runmode == RunMode.VelocityControl) {
             double speed = bufferFraction * output * ACHIEVABLE_MAX_TICKS_PER_SECOND;
-            double velocity = veloController.calculate(getVelocity(), speed) + feedforward.calculate(speed);
+            double velocity = veloController.calculate(getVelocity(), speed) + feedforward.calculate(speed, encoder.getAcceleration());
             power = velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND;
         } else if (runmode == RunMode.PositionControl) {
             double error = positionController.calculate(getDistance());
@@ -417,13 +427,13 @@ public class Motor implements HardwareDevice {
     /**
      * Set the buffer for the motor. This adds a fractional value to the velocity control.
      *
-     * @param bufferFraction a fractional value between (0, 1].
+     * @param fraction a fractional value between (0, 1].
      */
-    public void setBuffer(double bufferFraction) {
-        if (bufferFraction <= 0 || bufferFraction > 1) {
+    public void setBuffer(double fraction) {
+        if (fraction <= 0 || fraction > 1) {
             throw new IllegalArgumentException("Buffer must be between 0 and 1, exclusive to 0");
         }
-        this.bufferFraction = bufferFraction;
+        bufferFraction = fraction;
     }
 
     /**
@@ -518,19 +528,7 @@ public class Motor implements HardwareDevice {
     }
 
     /**
-     * Set the velocity pidf coefficients for the motor.
-     *
-     * @param kp the proportional gain
-     * @param ki the integral gain
-     * @param kd the derivative gain
-     * @param kf the feedforward gain
-     */
-    public void setVeloCoefficients(double kp, double ki, double kd, double kf) {
-        veloController.setPIDF(kp, ki, kd, kf);
-    }
-
-    /**
-     * Set the velocity pid coefficients for the motor, with a f of 0.
+     * Set the velocity pid coefficients for the motor.
      *
      * @param kp the proportional gain
      * @param ki the integral gain
@@ -565,21 +563,9 @@ public class Motor implements HardwareDevice {
      * Set the proportional gain for the position controller.
      *
      * @param kp the proportional gain
-     * @param ki the integral gain
-     * @param kd the derivative gain
-     * @param kf the feedforward gain
-     */
-    public void setPositionCoefficient(double kp, double ki, double kd, double kf) {
-        positionController.setPIDF(kp, ki, kd, kf);
-    }
-
-    /**
-     * Set the proportional gain for the position controller, with a f term of 0.
-     *
-     * @param kp the proportional gain
      */
     public void setPositionCoefficient(double kp) {
-        positionController.setPIDF(kp, 0, 0, 0);
+        positionController.setP(kp);
     }
 
     /**

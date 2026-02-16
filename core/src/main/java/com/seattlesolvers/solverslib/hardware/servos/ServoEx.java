@@ -58,6 +58,14 @@ public class ServoEx implements HardwareDevice {
         this(hwMap, id, 0.0, 1.0);
     }
 
+    /**
+     * A base constructor used for inheritance
+     */
+    public ServoEx() {
+        this.id = "";
+        this.servo = null;
+    }
+
 //    TODO: Actually implement this (needs more research on how it behaves with get and set positions)
 //    public void scaleRange(double min, double max) {
 //        servo.scaleRange(min, max);
