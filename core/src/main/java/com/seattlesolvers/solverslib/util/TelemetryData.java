@@ -22,11 +22,13 @@ public class TelemetryData {
     }
 
     public void update() {
-        telemetry.update();
-        for (Map.Entry<String, String> entry : dataMap.entrySet()) {
-            Log.v(entry.getKey(), entry.getValue());
-        }
+        if (!dataMap.isEmpty()) {
+            telemetry.update();
+            for (Map.Entry<String, String> entry : dataMap.entrySet()) {
+                Log.v(entry.getKey(), entry.getValue());
+            }
 
-        dataMap.clear();
+            dataMap.clear();
+        }
     }
 }
