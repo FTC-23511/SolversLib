@@ -69,12 +69,10 @@ public class RepeatCommand extends CommandBase{
      * @param maxRepeatTimes the number of times to repeat the command (has to be greater than 0)
      */
     public RepeatCommand(Command command, int maxRepeatTimes) {
-        this.maxRepeatTimes = maxRepeatTimes;
-        timesRepeated = 0;
-
         if (maxRepeatTimes <= 0) {
             throw new IllegalArgumentException("RepeatCommands' maxRepeatTimes cannot be negative or zero!");
         }
+        this.maxRepeatTimes = maxRepeatTimes;
 
         requireUngrouped(command);
         registerGroupedCommands(command);
@@ -82,34 +80,36 @@ public class RepeatCommand extends CommandBase{
         m_requirements.addAll(command.getRequirements());
     }
 
-
     @Override
     public void initialize() {
+        timesRepeated = 0;
         m_command.initialize();
     }
-
 
     @Override
     public void execute() {
         m_command.execute();
-        if (maxRepeatTimes != 0) {
-            timesRepeated++;
-        }
+
         if (m_command.isFinished()) {
-            // restart command
             m_command.end(false);
-            m_command.initialize();
+            timesRepeated++;
+
+            if (!this.isFinished()) {
+                m_command.initialize();
+            }
         }
     }
 
     @Override
     public boolean isFinished() {
-        return (maxRepeatTimes != 0 && timesRepeated >= maxRepeatTimes) || (condition != null && condition.getAsBoolean());
+        return (maxRepeatTimes > 0 && timesRepeated >= maxRepeatTimes) || (condition != null && condition.getAsBoolean());
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_command.end(interrupted);
+        if (m_command.isScheduled() || !m_command.isFinished()) {
+            m_command.end(interrupted);
+        }
     }
 
     @Override
