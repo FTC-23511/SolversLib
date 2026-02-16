@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Credit to FTC 16379 Kookybotz for this code
  */
 public class SlewRateLimiter {
-    private final double m_positiveRateLimit;
-    private final double m_negativeRateLimit;
+    private double m_positiveRateLimit;
+    private double m_negativeRateLimit;
     private final ElapsedTime m_timer;
     private double m_prevVal;
     private double m_prevTime;
@@ -28,6 +28,11 @@ public class SlewRateLimiter {
 
     public SlewRateLimiter(double rateLimit) {
         this(rateLimit, -rateLimit, 0);
+    }
+
+    public void updateRateLimit(double rateLimit) {
+        m_positiveRateLimit = rateLimit;
+        m_negativeRateLimit = -rateLimit;
     }
 
     public double calculate(double input) {

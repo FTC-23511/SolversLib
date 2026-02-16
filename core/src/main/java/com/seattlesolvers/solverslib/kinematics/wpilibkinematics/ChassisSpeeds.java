@@ -116,6 +116,20 @@ public class ChassisSpeeds {
         return fromFieldRelativeSpeeds(robotCentricSpeeds.vxMetersPerSecond, robotCentricSpeeds.vyMetersPerSecond, robotCentricSpeeds.omegaRadiansPerSecond, robotAngle);
     }
 
+    /**
+     * Converts robot-relative speeds into field-relative speeds.
+     * * @param robotSpeeds Robot-centric ChassisSpeeds (vx is forward, vy is left)
+     * @param robotAngle  The current heading of the robot (Rotation2d)
+     * @return Field-centric ChassisSpeeds
+     */
+    public static ChassisSpeeds toFieldRelativeSpeeds(ChassisSpeeds robotSpeeds, Rotation2d robotAngle) {
+        return new ChassisSpeeds(
+                robotSpeeds.vxMetersPerSecond * robotAngle.getCos() - robotSpeeds.vyMetersPerSecond * robotAngle.getSin(),
+                robotSpeeds.vxMetersPerSecond * robotAngle.getSin() + robotSpeeds.vyMetersPerSecond * robotAngle.getCos(),
+                robotSpeeds.omegaRadiansPerSecond
+        );
+    }
+
     @Override
     public String toString() {
         return String.format("ChassisSpeeds(Vx=%.2f m/s,Vy=%.2f m/s,Omega=%.2f rad/s)",
