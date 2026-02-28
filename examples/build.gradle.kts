@@ -10,14 +10,14 @@ ftc {
     solvers {
         implementation(core(""))
         implementation(pedroPathing(""))
+//        implementation(photon(""))
     }
 
-    pedro {
-        implementation(ftc)
-    }
+
 }
 
 // TODO: migrate once photon is published as part of easy auto libraries
 dependencies {
     implementation("org.solverslib:photon")
+    implementation("com.pedropathing:ftc:2.0.6")
 }
