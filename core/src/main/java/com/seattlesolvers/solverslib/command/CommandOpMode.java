@@ -47,6 +47,7 @@ public abstract class CommandOpMode extends LinearOpMode {
             while (opModeInInit()) {
                 initialize_loop();
             }
+            preRun();
             while (opModeIsActive()) {
                 run();
             }
@@ -60,6 +61,11 @@ public abstract class CommandOpMode extends LinearOpMode {
     }
 
     public abstract void initialize();
+
+    /**
+     * Runs before the OpMode is active and after init.
+     */
+    public void preRun() {}
 
     /**
      * Runs at the end (when opMode is no longer active) of CommandOpMode
