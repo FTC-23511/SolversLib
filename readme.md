@@ -14,7 +14,7 @@ Project led by FTC 23511, Seattle Solvers.
 - Daniel - FTC 7854
 - Nv7 - [FTC 21229](https://www.stem-bridge.org/home)
 - Lucas B - FTC 15215, 22407, and 24736
-- Suchir R - [FTC 194482](https://www.instagram.com/xbots_ftc/)
+- Suchir R - [FTC 19448](https://www.instagram.com/xbots_ftc/)
 ### Docs Contributors:
 - Arush Y (Owner) - [FTC 23511](https://www.seattlesolvers.com/)
 - Dohun - [FTC 22489](https://www.youtube.com/@GNCEDiamond22489)
