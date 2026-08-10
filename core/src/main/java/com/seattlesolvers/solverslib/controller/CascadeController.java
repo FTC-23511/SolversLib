@@ -4,6 +4,7 @@ public class CascadeController extends Controller {
     private final Controller primary;
     private final Controller secondary;
     private double velMeasuredValue;
+    private double prevMeasuredValue;
     private double velSetPoint;
 
     public CascadeController(Controller primary, Controller secondary) {
@@ -14,24 +15,21 @@ public class CascadeController extends Controller {
     @Override
     protected double calculateOutput(double pv) {
         prevErrorVal = errorVal_p;
+        prevMeasuredValue = measuredValue;
 
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
         if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
         period = currentTimeStamp - lastTimeStamp;
-        lastTimeStamp = currentTimeStamp;
 
-        if (measuredValue == pv) {
-            errorVal_p = setPoint - measuredValue;
-        } else {
-            errorVal_p = setPoint - pv;
+        if (measuredValue != pv) {
             measuredValue = pv;
         }
+        errorVal_p = setPoint - measuredValue;
 
         if (Math.abs(period) > 1E-6) {
-            velMeasuredValue = (errorVal_p - prevErrorVal) / period;
-        } else {
-            velMeasuredValue = 0;
-        }
+            velMeasuredValue = (measuredValue - prevMeasuredValue) / period;
+            lastTimeStamp = currentTimeStamp;
+        } 
 
         errorVal_v = velSetPoint - velMeasuredValue;
 
@@ -50,7 +48,11 @@ public class CascadeController extends Controller {
         setPoint = psp;
         velSetPoint = vsp;
         errorVal_p = setPoint - measuredValue;
-        velMeasuredValue = (errorVal_p - prevErrorVal) / period;
+        velMeasuredValue = (measuredValue - prevMeasuredValue) / period;
         errorVal_v = velSetPoint - velMeasuredValue;
+    }
+
+    public double getMeasuredVel() {
+        return velMeasuredValue;
     }
 }
