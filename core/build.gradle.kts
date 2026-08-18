@@ -14,11 +14,13 @@ ftc {
     kotlin()
 
     sdk {
-        implementation(RobotCore)
-        implementation(FtcCommon)
-        implementation(Hardware)
+        compileOnly(RobotCore)
+        compileOnly(FtcCommon)
+        compileOnly(Hardware)
 
         testImplementation(RobotCore)
+        testImplementation(FtcCommon)
+        testImplementation(Hardware)
     }
 }
 
