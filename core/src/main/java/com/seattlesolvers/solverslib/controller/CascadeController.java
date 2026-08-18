@@ -15,10 +15,12 @@ public class CascadeController extends Controller {
     @Override
     protected double calculateOutput(double pv) {
         prevErrorVal = errorVal_p;
-        prevMeasuredValue = measuredValue;
 
         double currentTimeStamp = (double) System.nanoTime() / 1E9;
-        if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
+        if (lastTimeStamp == 0) {
+            lastTimeStamp = currentTimeStamp;
+            prevMeasuredValue = pv;
+        }
         period = currentTimeStamp - lastTimeStamp;
 
         measuredValue = pv;
@@ -26,6 +28,7 @@ public class CascadeController extends Controller {
 
         if (Math.abs(period) > 1E-6) {
             velMeasuredValue = (measuredValue - prevMeasuredValue) / period;
+            prevMeasuredValue = measuredValue;
             lastTimeStamp = currentTimeStamp;
         }
 
@@ -38,6 +41,19 @@ public class CascadeController extends Controller {
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        velMeasuredValue = 0;
+
+        if (primary != null) {
+            primary.reset();
+        }
+        if (secondary != null) {
+            secondary.reset();
+        }
+    }
+
+    @Override
     public void setSetPoint(double sp) {
         setSetPoints(sp, 0);
     }
@@ -46,9 +62,6 @@ public class CascadeController extends Controller {
         setPoint = psp;
         velSetPoint = vsp;
         errorVal_p = setPoint - measuredValue;
-        if (Math.abs(period) > 1E-6) {
-            velMeasuredValue = (measuredValue - prevMeasuredValue) / period;
-        }
         errorVal_v = velSetPoint - velMeasuredValue;
     }
 
