@@ -21,19 +21,17 @@ public class CascadeController extends Controller {
         if (lastTimeStamp == 0) lastTimeStamp = currentTimeStamp;
         period = currentTimeStamp - lastTimeStamp;
 
-        if (measuredValue != pv) {
-            measuredValue = pv;
-        }
+        measuredValue = pv;
         errorVal_p = setPoint - measuredValue;
 
         if (Math.abs(period) > 1E-6) {
             velMeasuredValue = (measuredValue - prevMeasuredValue) / period;
             lastTimeStamp = currentTimeStamp;
-        } 
+        }
 
         errorVal_v = velSetPoint - velMeasuredValue;
 
-        double sp2 = primary.calculate(pv);
+        double sp2 = primary.calculate(pv, setPoint);
         double co2 = secondary.calculate(velMeasuredValue, sp2 + velSetPoint);
 
         return co2;
@@ -48,7 +46,9 @@ public class CascadeController extends Controller {
         setPoint = psp;
         velSetPoint = vsp;
         errorVal_p = setPoint - measuredValue;
-        velMeasuredValue = (measuredValue - prevMeasuredValue) / period;
+        if (Math.abs(period) > 1E-6) {
+            velMeasuredValue = (measuredValue - prevMeasuredValue) / period;
+        }
         errorVal_v = velSetPoint - velMeasuredValue;
     }
 
