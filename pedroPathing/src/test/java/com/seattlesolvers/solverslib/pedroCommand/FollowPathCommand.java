@@ -1,6 +1,5 @@
 package com.seattlesolvers.solverslib.pedroCommand;
 
-import com.pedropathing.paths.PathChain;
 import com.seattlesolvers.solverslib.command.CommandBase;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.paths.Path;
@@ -9,10 +8,15 @@ import com.pedropathing.paths.Path;
 // Thanks Powercube from Watt-sUP 16166, we copied verbatim
 
 /**
- * Allows you to run a PathChain or a Path (which is then converted into a PathChain) by scheduling it.
+ * Allows you to run a Path by scheduling it. In Pedro Pathing 3 a chain of paths is also a Path
+ * (see {@code Paths.path(Path...)}), so there is no separate PathChain constructor.
  * holdEnd is set to true by default, so you only need to give it your instance of follower and the Path to follow.
  * <p>
- * To see an example usage of this command, look at <a href="https://github.com/FTC-23511/SolversLib/blob/master/examples/src/main/java/org/firstinspires/ftc/teamcode/PedroCommandSample/FollowPedroSample.java">https://github.com/FTC-23511/SolversLib/blob/master/examples/src/main/java/org/firstinspires/ftc/teamcode/PedroCommandSample/FollowPedroSample.java</a>
+ * holdEnd is written to {@link Follower#holdEnd} when the command starts, and stays set on the
+ * follower afterwards. (A path modifier won't work instead: Pedro reverts path modifiers before it
+ * reads holdEnd, so {@code path.with(follower.holdEnd.at(false))} has no effect.)
+ * <p>
+ * To see an example usage of this command, look at <a href="https://github.com/FTC-23511/SolversLib/blob/master/examples/src/main/java/org/firstinspires/ftc/teamcode/PedroCommandSample/PedroAutoSample.java">https://github.com/FTC-23511/SolversLib/blob/master/examples/src/main/java/org/firstinspires/ftc/teamcode/PedroCommandSample/PedroAutoSample.java</a>
  *
  * @author Arush - FTC 23511
  * @author Saket - FTC 23511
@@ -20,67 +24,28 @@ import com.pedropathing.paths.Path;
  */
 public class FollowPathCommand extends CommandBase {
     private final Follower follower;
-    private final PathChain pathChain;
-    private boolean holdEnd;
-    private double maxPower = 1.0;
-
-    public FollowPathCommand(Follower follower, PathChain pathChain) {
-        this(follower, pathChain, true);
-    }
-
-    public FollowPathCommand(Follower follower, PathChain pathChain, boolean holdEnd) {
-        this(follower, pathChain, holdEnd, 1.0);
-    }
-
-    public FollowPathCommand(Follower follower, PathChain pathChain, double maxPower) {
-        this(follower, pathChain, true, maxPower);
-    }
-
-    public FollowPathCommand(Follower follower, PathChain pathChain, boolean holdEnd, double maxPower) {
-        this.follower = follower;
-        this.pathChain = pathChain;
-        this.holdEnd = holdEnd;
-        this.maxPower = maxPower;
-    }
+    private final Path path;
+    private final boolean holdEnd;
 
     public FollowPathCommand(Follower follower, Path path) {
         this(follower, path, true);
     }
 
     public FollowPathCommand(Follower follower, Path path, boolean holdEnd) {
-        this(follower, path, holdEnd, 1.0);
-    }
-
-    public FollowPathCommand(Follower follower, Path path, double maxPower) {
-        this(follower, path, true, maxPower);
-    }
-
-    public FollowPathCommand(Follower follower, Path path, boolean holdEnd, double maxPower) {
         this.follower = follower;
-        this.pathChain = new PathChain(path);
+        this.path = path;
         this.holdEnd = holdEnd;
-        this.maxPower = maxPower;
-    }
-
-    /**
-     * Sets Global Maximum Power for Follower, and overwrites maxPower in constructor
-     *
-     * @param globalMaxPower The new globalMaxPower
-     * @return This command for compatibility in command groups
-     */
-    public FollowPathCommand setGlobalMaxPower(double globalMaxPower) {
-        follower.setMaxPower(globalMaxPower);
-        maxPower = globalMaxPower;
-        return this;
     }
 
     @Override
     public void initialize() {
-        follower.followPath(pathChain, maxPower, holdEnd);
+        follower.holdEnd.set(holdEnd);
+        follower.follow(path);
     }
 
     @Override
     public boolean isFinished() {
-        return !follower.isBusy();
+        // Not isBusy(): Foresight only clears busy while holding, so with holdEnd = false it never clears
+        return !follower.following();
     }
 }

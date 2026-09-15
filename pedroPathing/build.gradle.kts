@@ -30,7 +30,7 @@ dependencies {
     implementation("org.ejml:ejml-simple:0.39") {
         exclude(group = "org.ejml", module = "ejml-all")
     }
-    implementation("com.pedropathing:ftc:2.0.6")
+    implementation("com.pedropathing:core:3.0.0")
 }
 
 publishing {

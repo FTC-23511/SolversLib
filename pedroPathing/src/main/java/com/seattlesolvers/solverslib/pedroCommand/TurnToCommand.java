@@ -1,14 +1,16 @@
 package com.seattlesolvers.solverslib.pedroCommand;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Pose;
 import com.seattlesolvers.solverslib.command.CommandBase;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 /**
- * A command that calls {@link Follower#holdPoint(Pose)}
+ * A command that turns the robot in place to a field heading, holding its current position.
+ * Pedro Pathing 3 removed {@code Follower.turnTo}, so this holds a rotated pose and finishes once
+ * the heading error is below {@link TurnCommand#headingTolerance}.
  *
  * @author Arush - FTC 23511
  */
@@ -27,11 +29,13 @@ public class TurnToCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        follower.turnTo(angle);
+        Pose current = follower.pose();
+        // Foresight normalizes heading error, so this takes the shorter way around
+        follower.hold(current.withHeading(angle));
     }
 
     @Override
     public boolean isFinished() {
-        return !follower.isBusy();
+        return TurnCommand.headingReached(follower, angle);
     }
 }
