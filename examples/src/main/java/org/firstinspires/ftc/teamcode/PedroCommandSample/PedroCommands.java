@@ -2,11 +2,11 @@ package org.firstinspires.ftc.teamcode.PedroCommandSample;
 
 
 
+import com.pedropathing.api.Paths;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Pose;
 
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.paths.Path;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.RunCommand;
 
@@ -23,21 +23,20 @@ public class PedroCommands extends CommandOpMode {
     Follower follower;
 
     Pose pose = new Pose(
-            72, 72, 90
+            72, 72, Math.toRadians(90)
     );
 
-    PathChain pathChain;
+    Path path;
 
     @Override
     public void initialize() {
         super.reset();
 
-        pathChain = follower.pathBuilder()
-                .addPath(new BezierLine(
-                        new Pose(0, 0, Math.toRadians(0)),
-                        new Pose(16, 28, Math.toRadians(90)))
-                ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
-                .build();
+        follower = Constants.createFollower(hardwareMap);
+
+        Pose start = new Pose(0, 0, Math.toRadians(0));
+        Pose end = new Pose(16, 28, Math.toRadians(90));
+        path = Paths.line(start, end).linear(start, end);
 
         schedule(
                 // Updates follower to follow path
@@ -56,10 +55,8 @@ public class PedroCommands extends CommandOpMode {
                 new TurnToCommand(follower, 90.0, AngleUnit.DEGREES),
 
                 // FollowPathCommand
-                new FollowPathCommand(follower, pathChain),
-                new FollowPathCommand(follower, pathChain, true),
-                new FollowPathCommand(follower, pathChain, true, 1.0),
-                new FollowPathCommand(follower, pathChain, true, 1.0).setGlobalMaxPower(1.0)
+                new FollowPathCommand(follower, path),
+                new FollowPathCommand(follower, path, true)
         );
     }
 
