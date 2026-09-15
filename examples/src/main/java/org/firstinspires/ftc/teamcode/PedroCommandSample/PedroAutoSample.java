@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.PedroCommandSample;
 
+import static com.pedropathing.api.Paths.curve;
+import static com.pedropathing.api.Paths.line;
+
+import com.pedropathing.api.PoseFactory;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
-import com.pedropathing.paths.PathChain;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 
 import com.seattlesolvers.solverslib.command.CommandOpMode;
 import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
@@ -19,62 +21,46 @@ public class PedroAutoSample extends CommandOpMode {
     private Follower follower;
     TelemetryData telemetryData = new TelemetryData(telemetry);
 
-    // Poses
-    private final Pose startPose = new Pose(9, 111, Math.toRadians(-90));
-    private final Pose scorePose = new Pose(16, 128, Math.toRadians(-45));
-    private final Pose pickup1Pose = new Pose(30, 121, Math.toRadians(0));
-    private final Pose pickup2Pose = new Pose(30, 131, Math.toRadians(0));
-    private final Pose pickup3Pose = new Pose(45, 128, Math.toRadians(90));
-    private final Pose parkPose = new Pose(68, 96, Math.toRadians(-90));
+    // Poses (headings in degrees)
+    private final PoseFactory p = PoseFactory.degrees();
+    private final Pose startPose = p.of(9, 111, -90);
+    private final Pose scorePose = p.of(16, 128, -45);
+    private final Pose pickup1Pose = p.of(30, 121, 0);
+    private final Pose pickup2Pose = p.of(30, 131, 0);
+    private final Pose pickup3Pose = p.of(45, 128, 90);
+    private final Pose parkPose = p.of(68, 96, -90);
 
-    // Path chains
-    private PathChain scorePreload, grabPickup1, grabPickup2, grabPickup3;
-    private PathChain scorePickup1, scorePickup2, scorePickup3, park;
+    // Paths
+    private Path scorePreload, grabPickup1, grabPickup2, grabPickup3;
+    private Path scorePickup1, scorePickup2, scorePickup3, park;
 
     public void buildPaths() {
-        scorePreload = follower.pathBuilder()
-                .addPath(new BezierLine(startPose, scorePose))
-                .setLinearHeadingInterpolation(startPose.getHeading(), scorePose.getHeading())
-                .build();
+        scorePreload = line(startPose, scorePose)
+                .linear(startPose, scorePose);
 
-        grabPickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup1Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup1Pose.getHeading())
-                .build();
+        grabPickup1 = line(scorePose, pickup1Pose)
+                .linear(scorePose, pickup1Pose);
 
-        scorePickup1 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup1Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup1Pose.getHeading(), scorePose.getHeading())
-                .build();
+        scorePickup1 = line(pickup1Pose, scorePose)
+                .linear(pickup1Pose, scorePose);
 
-        grabPickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup2Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup2Pose.getHeading())
-                .build();
+        grabPickup2 = line(scorePose, pickup2Pose)
+                .linear(scorePose, pickup2Pose);
 
-        scorePickup2 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup2Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup2Pose.getHeading(), scorePose.getHeading())
-                .build();
+        scorePickup2 = line(pickup2Pose, scorePose)
+                .linear(pickup2Pose, scorePose);
 
-        grabPickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(scorePose, pickup3Pose))
-                .setLinearHeadingInterpolation(scorePose.getHeading(), pickup3Pose.getHeading())
-                .build();
+        grabPickup3 = line(scorePose, pickup3Pose)
+                .linear(scorePose, pickup3Pose);
 
-        scorePickup3 = follower.pathBuilder()
-                .addPath(new BezierLine(pickup3Pose, scorePose))
-                .setLinearHeadingInterpolation(pickup3Pose.getHeading(), scorePose.getHeading())
-                .build();
+        scorePickup3 = line(pickup3Pose, scorePose)
+                .linear(pickup3Pose, scorePose);
 
-        park = follower.pathBuilder()
-                .addPath(new BezierCurve(
-                        scorePose,
-                        new Pose(68, 110), // Control point
-                        parkPose)
-                )
-                .setLinearHeadingInterpolation(scorePose.getHeading(), parkPose.getHeading())
-                .build();
+        park = curve(
+                scorePose,
+                p.of(68, 110, 0), // Control point
+                parkPose
+        ).linear(scorePose, parkPose);
     }
 
     // Mechanism commands - replace these with your actual subsystem commands
@@ -108,7 +94,7 @@ public class PedroAutoSample extends CommandOpMode {
 
         // Initialize follower
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(startPose);
+        follower.setPose(startPose);
         buildPaths();
 
         // Create the autonomous command sequence
@@ -119,8 +105,8 @@ public class PedroAutoSample extends CommandOpMode {
                 new WaitCommand(1000), // Wait 1 second
 
                 // First pickup cycle
-                new FollowPathCommand(follower, grabPickup1).setGlobalMaxPower(0.5), // Sets globalMaxPower to 50% for all future paths
-                                                                                     // (unless a custom maxPower is given)
+                new FollowPathCommand(follower, grabPickup1).setGlobalMaxPower(0.5), // Limits this and all future paths (of this follower)
+                                                                                     // to 50% of max speed, unless a custom maxPower is given
                 grabSample(),
                 new FollowPathCommand(follower, scorePickup1),
                 scoreSample(),
@@ -150,9 +136,12 @@ public class PedroAutoSample extends CommandOpMode {
     public void run() {
         super.run();
 
-        telemetryData.addData("X", follower.getPose().getX());
-        telemetryData.addData("Y", follower.getPose().getY());
-        telemetryData.addData("Heading", follower.getPose().getHeading());
+        // The follower needs to be updated every loop
+        follower.update();
+
+        telemetryData.addData("X", follower.pose().x());
+        telemetryData.addData("Y", follower.pose().y());
+        telemetryData.addData("Heading", follower.pose().heading());
         telemetryData.update();
     }
 }

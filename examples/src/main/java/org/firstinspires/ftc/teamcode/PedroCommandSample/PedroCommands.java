@@ -1,14 +1,13 @@
 package org.firstinspires.ftc.teamcode.PedroCommandSample;
 
-
+import static com.pedropathing.api.Paths.line;
 
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierLine;
-import com.pedropathing.geometry.Pose;
+import com.pedropathing.math.Pose;
+import com.pedropathing.paths.Path;
 
-import com.pedropathing.paths.PathChain;
 import com.seattlesolvers.solverslib.command.CommandOpMode;
-import com.seattlesolvers.solverslib.command.RunCommand;
+import com.seattlesolvers.solverslib.command.SequentialCommandGroup;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.seattlesolvers.solverslib.pedroCommand.FollowPathCommand;
@@ -18,34 +17,35 @@ import com.seattlesolvers.solverslib.pedroCommand.TurnToCommand;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
+/**
+ * Shows every constructor of the Pedro commands, run one after another in a SequentialCommandGroup.
+ * For a full autonomous, look at PedroAutoSample.
+ */
 @Autonomous
 public class PedroCommands extends CommandOpMode {
     Follower follower;
 
     Pose pose = new Pose(
-            72, 72, 90
+            72, 72, Math.toRadians(90)
     );
 
-    PathChain pathChain;
+    Path path;
 
     @Override
     public void initialize() {
         super.reset();
 
-        pathChain = follower.pathBuilder()
-                .addPath(new BezierLine(
-                        new Pose(0, 0, Math.toRadians(0)),
-                        new Pose(16, 28, Math.toRadians(90)))
-                ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(90))
-                .build();
+        follower = Constants.createFollower(hardwareMap);
 
-        schedule(
-                // Updates follower to follow path
-                new RunCommand(() -> follower.update()),
+        path = line(
+                new Pose(0, 0, Math.toRadians(0)),
+                new Pose(16, 28, Math.toRadians(90))
+        ).linear(Math.toRadians(0), Math.toRadians(90));
 
+        schedule(new SequentialCommandGroup(
                 // HoldPointCommand
-                new HoldPointCommand(follower, new Pose(0, 4, 0), false),
-                new HoldPointCommand(follower, pose, true),
+                new HoldPointCommand(follower, new Pose(4, 0, 0), false), // Robot centric: 4 inches forwards
+                new HoldPointCommand(follower, pose, true), // Field centric
 
                 // TurnCommand
                 new TurnCommand(follower, Math.PI / 2, false),
@@ -53,18 +53,21 @@ public class PedroCommands extends CommandOpMode {
 
                 // TurnToCommand
                 new TurnToCommand(follower, Math.PI / 2),
-                new TurnToCommand(follower, 90.0, AngleUnit.DEGREES),
+                new TurnToCommand(follower, 90.0, AngleUnit.DEGREES).setHeadingTolerance(1.0, AngleUnit.DEGREES),
 
                 // FollowPathCommand
-                new FollowPathCommand(follower, pathChain),
-                new FollowPathCommand(follower, pathChain, true),
-                new FollowPathCommand(follower, pathChain, true, 1.0),
-                new FollowPathCommand(follower, pathChain, true, 1.0).setGlobalMaxPower(1.0)
-        );
+                new FollowPathCommand(follower, path),
+                new FollowPathCommand(follower, path, true),
+                new FollowPathCommand(follower, path, true, 1.0),
+                new FollowPathCommand(follower, path, true, 1.0).setGlobalMaxPower(1.0)
+        ));
     }
 
     @Override
     public void run() {
         super.run();
+
+        // The follower needs to be updated every loop
+        follower.update();
     }
 }
