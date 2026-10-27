@@ -1,6 +1,6 @@
 # SolversLib
 
-An updated and maintained fork of FTCLib
+An updated and maintained fork of FTCLib, used by 500+ FTC robootics teams
 
 Project led by FTC 23511, Seattle Solvers.
 
