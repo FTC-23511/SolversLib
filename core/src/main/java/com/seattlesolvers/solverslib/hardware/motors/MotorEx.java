@@ -127,11 +127,10 @@ public class MotorEx extends Motor {
      * @param power power to be assigned to the motor if difference is greater than caching tolerance or if power is exactly 0
      */
     private void setPower(double power) {
-        double currentPower = motorEx.getPower();
-        if ((Math.abs(power - currentPower) > cachingTolerance) || (power == 0 && currentPower != 0)) {
+        if ((Math.abs(power - lastPower) > cachingTolerance) || (power == 0 && lastPower != 0)) {
+            lastPower = power;
             motorEx.setPower(power);
         }
-        lastPower = power;
     }
 
     /**
