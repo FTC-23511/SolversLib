@@ -588,5 +588,8 @@ public class Motor implements HardwareDevice {
      */
     public void stopMotor() {
         motor.setPower(0);
+        lastPower = 0;
+        veloController.reset();
+        positionController.reset();
     }
 }
