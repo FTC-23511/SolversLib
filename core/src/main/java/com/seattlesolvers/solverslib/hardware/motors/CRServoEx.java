@@ -180,6 +180,15 @@ public class CRServoEx extends CRServo {
         }
     }
 
+    /**
+     * Stops the CR servo for both OptimizedPositionalControl and RawPower.
+     */
+    @Override
+    public void stop() {
+        crServo.setPower(0);
+        lastPower = 0;
+    }
+
     @Override
     public String getDeviceType() {
         return "Extended " + super.getDeviceType();
