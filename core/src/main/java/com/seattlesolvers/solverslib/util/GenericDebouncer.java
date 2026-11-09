@@ -19,7 +19,7 @@ public class GenericDebouncer<T> {
     /**
      * Creates a fully specified debouncer
      *
-     * @param debounce Debounce time
+     * @param debounce Debounce time in milliseconds
      * @param initial What the initial value is
      */
     public GenericDebouncer(double debounce, T initial) {
@@ -34,7 +34,7 @@ public class GenericDebouncer<T> {
      * @return The debounced value
      */
     public T calculate(T input) {
-        if (Objects.equals(input, lastInput)) {
+        if (!Objects.equals(input, lastInput)) {
             lastInput = input;
             previousTime = System.nanoTime();
         }
