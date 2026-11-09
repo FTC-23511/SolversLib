@@ -148,6 +148,20 @@ public class CRServoEx extends CRServo {
     }
 
     /**
+     * Stops the CR servo by writing 0 power straight to the servo, skipping the power cache so the
+     * write always happens. {@link #set(double)} can't be used since it treats its argument as a
+     * target angle in {@link RunMode#OptimizedPositionalControl}.
+     */
+    @Override
+    public void stop() {
+        crServo.setPower(0);
+        lastPower = 0;
+        if (pidf != null) {
+            pidf.reset();
+        }
+    }
+
+    /**
      * @param pwmRange the PWM range the CR servo should be set to
      * @return this object for chaining purposes
      */
