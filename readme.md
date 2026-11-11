@@ -33,8 +33,6 @@ Javadocs for SolversLib Core (standard FTCLib, has Command Base, Hardware, Gamep
 Javadocs for SolversLib Pedro Pathing (Pedro Pathing support in FTCLib) are available at <https://repo.dairy.foundation/javadoc/releases/org/solverslib/pedroPathing/latest>, but you can replace `latest` with the desired version number.
 
 
-FTCLib documentation (has information about how to use FTCLib, and does not have any information about SolversLib) - <https://docs.ftclib.org/ftclib>
-
 Please note that the vision part of FTCLib has been removed in SolversLib, as it is severely outdated. If you want vision, please use EasyOpenCV (which is built into the SDK).
 
 ## Installing SolversLib
