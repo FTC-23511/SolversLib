@@ -27,9 +27,13 @@ Complete Documentation (Highly Recommended): [https://docs.seattlesolvers.com/](
 
 You can find the latest version number (and the implementation details) at the [Dairy Foundation](https://repo.dairy.foundation/#/releases/org/solverslib/core), where SolversLib is hosted.
 
-Javadocs for SolversLib Core are available at <https://repo.dairy.foundation/javadoc/releases/org/solverslib/core/latest>, but you can replace `latest` with the desired version number.
+Javadocs for SolversLib Core (standard FTCLib, has Command Base, Hardware, Gamepads, etc.) are available at <https://repo.dairy.foundation/javadoc/releases/org/solverslib/core/latest>, but you can replace `latest` with the desired version number.
 
-Javadocs for SolversLib Pedro Pathing are available at <https://repo.dairy.foundation/javadoc/releases/org/solverslib/pedroPathing/latest>, but you can replace `latest` with the desired version number.
+
+Javadocs for SolversLib Pedro Pathing (Pedro Pathing support in FTCLib) are available at <https://repo.dairy.foundation/javadoc/releases/org/solverslib/pedroPathing/latest>, but you can replace `latest` with the desired version number.
+
+
+Please note that the vision part of FTCLib has been removed in SolversLib, as it is severely outdated. If you want vision, please use EasyOpenCV (which is built into the SDK).
 
 ## Installing SolversLib
 See [https://docs.seattlesolvers.com/installation](https://docs.seattlesolvers.com/installation)
