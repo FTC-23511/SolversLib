@@ -372,10 +372,33 @@ public class Motor implements HardwareDevice {
     }
 
     /**
-     * @return the position coefficient
+     * @return the position P value (kept for compatibility)
      */
     public double getPositionCoefficient() {
         return positionController.getP();
+    }
+
+    /**
+     * @return the position PIDF values
+     */
+    public double[] getPositionCoefficiens() {
+        return new double[] {getPositionP(), getPositionI(), getPositionD(), getPositionF()};
+    }
+
+    public double getPositionP() {
+        return positionController.getP();
+    }
+
+    public double getPositionI() {
+        return positionController.getI();
+    }
+
+    public double getPositionD() {
+        return positionController.getD();
+    }
+
+    public double getPositionF() {
+        return positionController.getF();
     }
 
     /**
@@ -567,6 +590,21 @@ public class Motor implements HardwareDevice {
     public void setPositionCoefficient(double kp) {
         positionController.setP(kp);
     }
+
+    /**
+     * Set the PID gains for the position controller.
+     */
+    public void setPositionCoefficient(double kp, double ki, double kd) {
+        positionController.setPIDF(kp, ki, kd, positionController.getF());
+    }
+
+    /**
+     * Set the PIDF gains for the position controller.
+     */
+    public void setPositionCoefficient(double kp, double ki, double kd, double kf) {
+        positionController.setPIDF(kp, ki, kd, kf);
+    }
+
 
     /**
      * Disable the motor.

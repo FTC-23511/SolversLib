@@ -139,6 +139,36 @@ public class MotorGroup extends Motor implements Iterable<Motor> {
     }
 
     @Override
+    public void setPositionCoefficient(double kp, double ki, double kd) {
+        group[0].setPositionCoefficient(kp, ki, kd);
+    }
+
+    @Override
+    public void setPositionCoefficient(double kp, double ki, double kd, double kf) {
+        group[0].setPositionCoefficient(kp, ki, kd, kf);
+    }
+
+    @Override
+    public double getPositionP() {
+        return group[0].getPositionP();
+    }
+
+    @Override
+    public double getPositionI() {
+        return group[0].getPositionI();
+    }
+
+    @Override
+    public double getPositionD() {
+        return group[0].getPositionD();
+    }
+
+    @Override
+    public double getPositionF() {
+        return group[0].getPositionF();
+    }
+
+    @Override
     public boolean atTargetPosition() {
         return group[0].atTargetPosition();
     }
