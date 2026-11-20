@@ -62,7 +62,8 @@ public class MotorEx extends Motor {
         if (runmode == RunMode.VelocityControl && output == 0
                 && motorEx.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
             // The PID/feedforward output is almost never exactly 0, so the hardware brake would never engage
-            stopMotor();
+            setPower(0);
+            veloController.reset();
         } else if (runmode == RunMode.VelocityControl) {
             double speed = bufferFraction * output * ACHIEVABLE_MAX_TICKS_PER_SECOND;
             double velocity = veloController.calculate(getCorrectedVelocity(), speed) + feedforward.calculate(speed);
