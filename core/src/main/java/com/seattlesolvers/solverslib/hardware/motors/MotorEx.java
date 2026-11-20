@@ -2,6 +2,7 @@ package com.seattlesolvers.solverslib.hardware.motors;
 
 import androidx.annotation.NonNull;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
@@ -58,7 +59,12 @@ public class MotorEx extends Motor {
 
     @Override
     public void set(double output) {
-        if (runmode == RunMode.VelocityControl) {
+        if (runmode == RunMode.VelocityControl && output == 0
+                && motorEx.getZeroPowerBehavior() == DcMotor.ZeroPowerBehavior.BRAKE) {
+            // The PID/feedforward output is almost never exactly 0, so the hardware brake would never engage
+            setPower(0);
+            veloController.reset();
+        } else if (runmode == RunMode.VelocityControl) {
             double speed = bufferFraction * output * ACHIEVABLE_MAX_TICKS_PER_SECOND;
             double velocity = veloController.calculate(getCorrectedVelocity(), speed) + feedforward.calculate(speed);
             setPower(velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND);
