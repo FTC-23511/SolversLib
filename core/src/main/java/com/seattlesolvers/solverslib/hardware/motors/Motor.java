@@ -308,8 +308,9 @@ public class Motor implements HardwareDevice {
             double velocity = veloController.calculate(getVelocity(), speed) + feedforward.calculate(speed, encoder.getAcceleration());
             power = velocity / ACHIEVABLE_MAX_TICKS_PER_SECOND;
         } else if (runmode == RunMode.PositionControl) {
-            double error = positionController.calculate(getDistance());
-            power = output * error;
+            double f = positionController.getF() * positionController.getSetPoint();
+            double error = positionController.calculate(getDistance()) - f;
+            power = output * error + f;
         } else {
             power = output;
         }
@@ -372,10 +373,33 @@ public class Motor implements HardwareDevice {
     }
 
     /**
-     * @return the position coefficient
+     * @return the position P value (kept for compatibility)
      */
     public double getPositionCoefficient() {
         return positionController.getP();
+    }
+
+    /**
+     * @return the position PIDF values
+     */
+    public double[] getPositionCoefficients() {
+        return new double[] {getPositionP(), getPositionI(), getPositionD(), getPositionF()};
+    }
+
+    public double getPositionP() {
+        return positionController.getP();
+    }
+
+    public double getPositionI() {
+        return positionController.getI();
+    }
+
+    public double getPositionD() {
+        return positionController.getD();
+    }
+
+    public double getPositionF() {
+        return positionController.getF();
     }
 
     /**
@@ -567,6 +591,23 @@ public class Motor implements HardwareDevice {
     public void setPositionCoefficient(double kp) {
         positionController.setP(kp);
     }
+
+    /**
+     * Set the PID gains for the position controller.
+     */
+    public void setPositionCoefficient(double kp, double ki, double kd) {
+        positionController.setPIDF(kp, ki, kd, positionController.getF());
+    }
+
+    /**
+     * Set the PIDF gains for the position controller.
+     * 
+     * {@link #set(double)} scales only the P, I and D terms by its argument; F is not scaled.
+     */
+    public void setPositionCoefficient(double kp, double ki, double kd, double kf) {
+        positionController.setPIDF(kp, ki, kd, kf);
+    }
+
 
     /**
      * Disable the motor.
